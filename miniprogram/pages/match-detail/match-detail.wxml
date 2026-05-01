@@ -1,0 +1,119 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <view class="header-card">
+      <view class="item-name">{{itemInfo.name}}</view>
+      <view class="item-status {{itemInfo.status === '报名中' ? 'status-registering' : itemInfo.status === '进行中' ? 'status-ongoing' : 'status-finished'}}">
+        {{itemInfo.status}}
+      </view>
+      <view wx:if="{{itemInfo.description}}" class="item-desc">{{itemInfo.description}}</view>
+      <view class="item-stats">
+        <view class="stat">
+          <text class="stat-value">{{players.length}}</text>
+          <text class="stat-label">参赛人数</text>
+        </view>
+        <view class="stat">
+          <text class="stat-value">{{schedules.length}}</text>
+          <text class="stat-label">比赛场次</text>
+        </view>
+        <view class="stat">
+          <text class="stat-value">{{results.length}}</text>
+          <text class="stat-label">已完成</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="tabs">
+      <view 
+        wx:for="{{tabs}}" 
+        wx:key="index" 
+        class="tab-item {{currentTab === index ? 'active' : ''}}"
+        data-index="{{index}}"
+        bindtap="onTabChange"
+      >
+        {{item}}
+      </view>
+    </view>
+
+    <swiper class="swiper" current="{{currentTab}}" bindchange="onSwiperChange">
+      <swiper-item>
+        <scroll-view scroll-y class="scroll-view">
+          <view wx:if="{{players.length === 0}}" class="empty-state">
+            <view class="empty-icon">👥</view>
+            <text>暂无参赛选手</text>
+          </view>
+          <view wx:else class="player-grid">
+            <view wx:for="{{players}}" wx:key="_id" class="player-item">
+              <view class="player-avatar">{{item.name[0]}}</view>
+              <view class="player-name">{{item.name}}</view>
+              <view class="player-skill">{{item.skillLevel}}</view>
+            </view>
+          </view>
+        </scroll-view>
+      </swiper-item>
+
+      <swiper-item>
+        <scroll-view scroll-y class="scroll-view">
+          <view wx:if="{{schedules.length === 0}}" class="empty-state">
+            <view class="empty-icon">📅</view>
+            <text>暂无赛程安排</text>
+          </view>
+          <view wx:else class="schedule-list">
+            <view wx:for="{{schedules}}" wx:key="_id" class="schedule-card">
+              <view class="schedule-header">
+                <text class="schedule-round">{{item.round}}</text>
+                <text class="schedule-time">{{item.matchTime}}</text>
+              </view>
+              <view class="schedule-content">
+                <view class="team">
+                  <text wx:for="{{item.team1}}" wx:for-item="player" wx:key="id" class="player-name">{{player.name}}</text>
+                </view>
+                <view class="vs">VS</view>
+                <view class="team">
+                  <text wx:for="{{item.team2}}" wx:for-item="player" wx:key="id" class="player-name">{{player.name}}</text>
+                </view>
+              </view>
+              <view class="schedule-status {{item.status === 'pending' ? 'status-pending' : item.status === 'playing' ? 'status-playing' : 'status-finished'}}">
+                {{item.status === 'pending' ? '待开始' : item.status === 'playing' ? '进行中' : '已结束'}}
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </swiper-item>
+
+      <swiper-item>
+        <scroll-view scroll-y class="scroll-view">
+          <view wx:if="{{results.length === 0}}" class="empty-state">
+            <view class="empty-icon">🏆</view>
+            <text>暂无比赛结果</text>
+          </view>
+          <view wx:else class="result-list">
+            <view wx:for="{{results}}" wx:key="_id" class="result-card">
+              <view class="result-header">
+                <text class="result-round">{{item.round}}</text>
+              </view>
+              <view class="result-content">
+                <view class="team {{item.winner === 1 ? 'winner' : 'loser'}}">
+                  <view class="team-players">
+                    <text wx:for="{{item.team1}}" wx:for-item="player" wx:key="id">{{player.name}}</text>
+                  </view>
+                  <view class="team-score">{{item.score1}}</view>
+                </view>
+                <view class="vs">:</view>
+                <view class="team {{item.winner === 2 ? 'winner' : 'loser'}}">
+                  <view class="team-score">{{item.score2}}</view>
+                  <view class="team-players">
+                    <text wx:for="{{item.team2}}" wx:for-item="player" wx:key="id">{{player.name}}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </swiper-item>
+    </swiper>
+  </block>
+</view>

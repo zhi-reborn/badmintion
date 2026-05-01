@@ -1,0 +1,82 @@
+<view class="container">
+  <view class="stats-bar">
+    <text>共 {{players.length}} 位报名选手</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{players.length === 0}}" class="empty-state">
+    <view class="empty-icon">👥</view>
+    <text>暂无报名选手</text>
+  </view>
+
+  <view wx:else class="player-list">
+    <view wx:for="{{players}}" wx:key="_id" class="player-card">
+      <view class="player-header">
+        <view class="player-avatar">{{item.name[0]}}</view>
+        <view class="player-info">
+          <view class="player-name">{{item.name}}</view>
+          <view class="player-dept">{{item.department}}</view>
+        </view>
+        <view class="player-skill {{item.skillLevel === '初级' ? 'skill-beginner' : item.skillLevel === '中级' ? 'skill-intermediate' : item.skillLevel === '高级' ? 'skill-advanced' : 'skill-professional'}}">
+          {{item.skillLevel}}
+        </view>
+      </view>
+      
+      <view class="player-detail">
+        <view class="detail-item">
+          <text class="detail-label">性别</text>
+          <text class="detail-value">{{item.gender}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">电话</text>
+          <text class="detail-value">{{item.phone}}</text>
+        </view>
+      </view>
+
+      <view class="player-items">
+        <text class="items-label">参赛项目：</text>
+        <view class="items-tags">
+          <text wx:for="{{item.items}}" wx:for-item="matchItem" wx:key="*this" class="item-tag">{{matchItem}}</text>
+        </view>
+      </view>
+
+      <view class="player-actions">
+        <button class="btn-edit" data-player="{{item}}" bindtap="showEditDialog">修改技术等级</button>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showEditModal}}" class="modal-mask" catchtap="closeModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">修改技术等级</text>
+        <text class="modal-close" bindtap="closeModal">×</text>
+      </view>
+      
+      <view class="modal-body">
+        <view class="edit-player-info">
+          <text class="edit-player-name">{{editingPlayer.name}}</text>
+          <text class="edit-player-dept">{{editingPlayer.department}}</text>
+        </view>
+        
+        <view class="form-item">
+          <view class="form-label">技术等级</view>
+          <picker mode="selector" range="{{skillOptions}}" value="{{skillIndex}}" bindchange="onSkillChange">
+            <view class="form-picker">
+              <text>{{skillOptions[skillIndex]}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="closeModal">取消</button>
+        <button class="btn-confirm" bindtap="saveSkill">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,107 @@
+<view class="container">
+  <view class="header">
+    <button class="btn-add" bindtap="showAddModal">+ 添加场地</button>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{venues.length === 0}}" class="empty-state">
+    <view class="empty-icon">🏟️</view>
+    <text>暂无场地</text>
+  </view>
+
+  <view wx:else class="venue-list">
+    <view wx:for="{{venues}}" wx:key="_id" class="venue-card">
+      <view class="venue-header">
+        <view class="venue-name">{{item.name}}</view>
+        <view class="venue-type {{item.type === '室内' ? 'type-indoor' : 'type-outdoor'}}">
+          {{item.type}}
+        </view>
+      </view>
+      
+      <view class="venue-info">
+        <view class="info-row">
+          <text class="info-icon">📍</text>
+          <text>{{item.address || '暂无地址'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-icon">💰</text>
+          <text>¥{{item.price || 0}}/小时</text>
+        </view>
+        <view class="info-row">
+          <text class="info-icon">⭐</text>
+          <text>{{item.rating || 5.0}}分</text>
+        </view>
+      </view>
+
+      <view wx:if="{{item.facilities.length > 0}}" class="venue-facilities">
+        <text wx:for="{{item.facilities}}" wx:for-item="facility" wx:key="*this" class="facility-tag">{{facility}}</text>
+      </view>
+
+      <view class="venue-actions">
+        <button class="btn-edit" data-id="{{item._id}}" bindtap="editVenue">编辑</button>
+        <button class="btn-delete" data-id="{{item._id}}" bindtap="deleteVenue">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showAddModal}}" class="modal-mask" catchtap="closeModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">{{editMode ? '编辑场地' : '添加场地'}}</text>
+        <text class="modal-close" bindtap="closeModal">×</text>
+      </view>
+      
+      <scroll-view scroll-y class="modal-body">
+        <view class="form-item">
+          <view class="form-label">场地名称 <text class="required">*</text></view>
+          <input class="form-input" placeholder="请输入场地名称" value="{{formData.name}}" data-field="name" bindinput="onInputChange" />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">场地类型</view>
+          <picker mode="selector" range="{{typeOptions}}" value="{{typeIndex}}" bindchange="onTypeChange">
+            <view class="form-picker">
+              <text>{{typeOptions[typeIndex]}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">场地地址</view>
+          <input class="form-input" placeholder="请输入场地地址" value="{{formData.address}}" data-field="address" bindinput="onInputChange" />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">价格（元/小时）</view>
+          <input class="form-input" type="digit" placeholder="0" value="{{formData.price}}" data-field="price" bindinput="onInputChange" />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">设施</view>
+          <checkbox-group bindchange="onFacilityChange">
+            <view class="checkbox-grid">
+              <label wx:for="{{facilityOptions}}" wx:key="*this" class="checkbox-item">
+                <checkbox value="{{item}}" checked="{{selectedFacilities.indexOf(item) >= 0}}" />
+                <text>{{item}}</text>
+              </label>
+            </view>
+          </checkbox-group>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">场地描述</view>
+          <textarea class="form-textarea" placeholder="请输入场地描述" value="{{formData.description}}" data-field="description" bindinput="onInputChange" />
+        </view>
+      </scroll-view>
+
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="closeModal">取消</button>
+        <button class="btn-confirm" bindtap="saveVenue">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

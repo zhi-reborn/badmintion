@@ -1,0 +1,44 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{activities.length === 0}}" class="empty-state">
+    <view class="empty-icon">📅</view>
+    <text>暂无报名的活动</text>
+    <view class="empty-tip">快去活动中心报名参加活动吧</view>
+  </view>
+
+  <view wx:else class="activity-list">
+    <view wx:for="{{activities}}" wx:key="_id" class="activity-card" data-id="{{item.activityId}}" bindtap="goToActivityDetail">
+      <view class="activity-header">
+        <view class="activity-type {{item.type === '比赛' ? 'type-match' : item.type === '约球' ? 'type-play' : 'type-train'}}">
+          {{item.type || '活动'}}
+        </view>
+        <view class="activity-status {{item.status === '报名中' ? 'status-open' : item.status === '进行中' ? 'status-ongoing' : 'status-ended'}}">
+          {{item.status || '已结束'}}
+        </view>
+      </view>
+      
+      <view class="activity-title">{{item.title}}</view>
+      
+      <view class="activity-info">
+        <view class="info-item">
+          <text class="info-icon">📍</text>
+          <text>{{item.venue || '待定'}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-icon">🕐</text>
+          <text>{{item.time}}</text>
+        </view>
+      </view>
+      
+      <view class="activity-footer">
+        <view class="register-time">
+          <text class="register-label">报名时间：</text>
+          <text class="register-value">{{item.registerTime}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,63 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/register/register",
+    "pages/players/players",
+    "pages/matches/matches",
+    "pages/match-detail/match-detail",
+    "pages/venues/venues",
+    "pages/venue-detail/venue-detail",
+    "pages/activities/activities",
+    "pages/activity-detail/activity-detail",
+    "pages/profile/profile",
+    "pages/ranking/ranking",
+    "pages/admin/index/index",
+    "pages/admin/players/players",
+    "pages/admin/matches/matches",
+    "pages/admin/match-item/match-item",
+    "pages/admin/venues/venues",
+    "pages/admin/activities/activities",
+    "pages/my-activities/my-activities",
+    "pages/my-matches/my-matches",
+    "pages/my-album/my-album",
+    "pages/my-favorites/my-favorites"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#0ABAB5",
+    "navigationBarTitleText": "羽毛球协会",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#0ABAB5",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/activities/activities",
+        "text": "活动"
+      },
+      {
+        "pagePath": "pages/venues/venues",
+        "text": "场地"
+      },
+      {
+        "pagePath": "pages/ranking/ranking",
+        "text": "排行榜"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "cloud": true
+}

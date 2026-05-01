@@ -1,0 +1,57 @@
+<view class="container">
+  <view class="filter-section">
+    <text class="filter-label">筛选项目：</text>
+    <picker mode="selector" range="{{itemOptions}}" value="{{itemOptions.indexOf(currentItem)}}" bindchange="onItemChange">
+      <view class="filter-picker">
+        <text>{{currentItem}}</text>
+        <text class="picker-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="stats-bar">
+    <text>共 {{filteredPlayers.length}} 位选手</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{filteredPlayers.length === 0}}" class="empty-state">
+    <view class="empty-icon">👥</view>
+    <text>暂无报名选手</text>
+  </view>
+
+  <view wx:else class="player-list">
+    <view wx:for="{{filteredPlayers}}" wx:key="_id" class="player-card">
+      <view class="player-header">
+        <view class="player-avatar">{{item.name[0]}}</view>
+        <view class="player-info">
+          <view class="player-name">{{item.name}}</view>
+          <view class="player-dept">{{item.department}}</view>
+        </view>
+        <view class="player-skill {{item.skillLevel === '初级' ? 'skill-beginner' : item.skillLevel === '中级' ? 'skill-intermediate' : item.skillLevel === '高级' ? 'skill-advanced' : 'skill-professional'}}">
+          {{item.skillLevel}}
+        </view>
+      </view>
+      
+      <view class="player-detail">
+        <view class="detail-item">
+          <text class="detail-label">性别</text>
+          <text class="detail-value">{{item.gender}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">电话</text>
+          <text class="detail-value">{{item.phone}}</text>
+        </view>
+      </view>
+
+      <view class="player-items">
+        <text class="items-label">参赛项目：</text>
+        <view class="items-tags">
+          <text wx:for="{{item.items}}" wx:for-item="matchItem" wx:key="*this" class="item-tag">{{matchItem}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,64 @@
+<view class="container">
+  <view class="header">
+    <view class="header-top">
+      <view class="back-btn" bindtap="goToHome">
+        <text>← 首页</text>
+      </view>
+      <view class="header-title">场地预订</view>
+      <view class="header-placeholder"></view>
+    </view>
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索场地" />
+    </view>
+    <view class="type-tabs">
+      <view 
+        wx:for="{{types}}" 
+        wx:key="index" 
+        class="type-tab {{currentType === item ? 'active' : ''}}"
+        data-type="{{item}}"
+        bindtap="onTypeChange"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{venues.length === 0}}" class="empty-state">
+    <view class="empty-icon">🏟️</view>
+    <text>暂无场地信息</text>
+  </view>
+
+  <view wx:else class="venue-list">
+    <view wx:for="{{venues}}" wx:key="_id" class="venue-card" data-id="{{item._id}}" bindtap="goToVenueDetail">
+      <view class="venue-image">
+        <image src="{{item.image || '/images/default-venue.png'}}" mode="aspectFill" />
+        <view class="venue-type-tag">{{item.type}}</view>
+      </view>
+      <view class="venue-info">
+        <view class="venue-name">{{item.name}}</view>
+        <view class="venue-address">
+          <text class="address-icon">📍</text>
+          <text>{{item.address}}</text>
+        </view>
+        <view class="venue-meta">
+          <view class="venue-price">
+            <text class="price-value">¥{{item.price}}</text>
+            <text class="price-unit">/小时</text>
+          </view>
+          <view class="venue-rating">
+            <text class="rating-icon">⭐</text>
+            <text>{{item.rating || '5.0'}}</text>
+          </view>
+        </view>
+        <view class="venue-tags">
+          <text wx:for="{{item.facilities}}" wx:for-item="facility" wx:key="*this" class="facility-tag">{{facility}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

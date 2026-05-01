@@ -1,0 +1,61 @@
+<view class="container">
+  <view wx:if="{{checking}}" class="loading-state">
+    <text>验证权限中...</text>
+  </view>
+
+  <block wx:elif="{{isAdmin}}">
+    <view class="header">
+      <view class="header-icon">⚙️</view>
+      <view class="header-title">管理后台</view>
+      <view class="header-subtitle">仅限管理员访问</view>
+    </view>
+
+    <view class="menu-list">
+    <view class="menu-item" bindtap="goToPlayerManage">
+      <view class="menu-icon">👥</view>
+      <view class="menu-content">
+        <view class="menu-title">选手管理</view>
+        <view class="menu-desc">修改选手技术等级、查看报名信息</view>
+      </view>
+      <view class="menu-arrow">→</view>
+    </view>
+
+    <view class="menu-item" bindtap="goToMatchManage">
+      <view class="menu-icon">🏆</view>
+      <view class="menu-content">
+        <view class="menu-title">比赛管理</view>
+        <view class="menu-desc">创建比赛项目、录入比赛结果</view>
+      </view>
+      <view class="menu-arrow">→</view>
+    </view>
+
+    <view class="menu-item" bindtap="goToActivityManage">
+      <view class="menu-icon">📅</view>
+      <view class="menu-content">
+        <view class="menu-title">活动管理</view>
+        <view class="menu-desc">发布活动、约球、训练</view>
+      </view>
+      <view class="menu-arrow">→</view>
+    </view>
+
+    <view class="menu-item" bindtap="goToVenueManage">
+      <view class="menu-icon">🏟️</view>
+      <view class="menu-content">
+        <view class="menu-title">场地管理</view>
+        <view class="menu-desc">添加场地信息、管理场地</view>
+      </view>
+      <view class="menu-arrow">→</view>
+    </view>
+    </view>
+
+    <view class="tips">
+      <view class="tips-title">💡 使用提示</view>
+      <view class="tips-content">
+        <view class="tip-item">• 在选手管理中可以修改选手的技术等级</view>
+        <view class="tip-item">• 在比赛管理中可以创建比赛项目和录入比赛结果</view>
+        <view class="tip-item">• 在活动管理中可以发布比赛、约球、训练活动</view>
+        <view class="tip-item">• 请确保录入的比赛结果准确无误</view>
+      </view>
+    </view>
+  </block>
+</view>

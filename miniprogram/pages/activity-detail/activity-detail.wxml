@@ -1,0 +1,81 @@
+<view class="container">
+  <view wx:if="{{loading || checkingStatus}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <view class="header">
+      <view class="activity-type {{activity.type === '比赛' ? 'type-match' : activity.type === '约球' ? 'type-play' : 'type-train'}}">
+        {{activity.type}}
+      </view>
+      <view class="activity-title">{{activity.title}}</view>
+      <view class="activity-status {{activity.status === '报名中' ? 'status-open' : 'status-ongoing'}}">
+        {{activity.status}}
+      </view>
+    </view>
+
+    <view class="info-card">
+      <view class="info-item">
+        <view class="info-icon">📍</view>
+        <view class="info-content">
+          <view class="info-label">活动地点</view>
+          <view class="info-value">{{activity.venue || '待定'}}</view>
+        </view>
+      </view>
+      <view class="info-item">
+        <view class="info-icon">🕐</view>
+        <view class="info-content">
+          <view class="info-label">活动时间</view>
+          <view class="info-value">{{activity.time || '待定'}}</view>
+        </view>
+      </view>
+      <view class="info-item">
+        <view class="info-icon">👥</view>
+        <view class="info-content">
+          <view class="info-label">报名人数</view>
+          <view class="info-value">{{participants.length}}/{{activity.maxCount || '不限'}}人</view>
+        </view>
+      </view>
+      <view class="info-item">
+        <view class="info-icon">💰</view>
+        <view class="info-content">
+          <view class="info-label">活动费用</view>
+          <view class="info-value">¥{{activity.fee || 0}}/人</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">活动详情</view>
+      <view class="section-content">{{activity.description || '暂无详情'}}</view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">已报名 ({{participants.length}}人)</view>
+      <view wx:if="{{participants.length === 0}}" class="empty-tip">暂无报名</view>
+      <view wx:else class="participant-list">
+        <view wx:for="{{participants}}" wx:key="_id" class="participant-item">
+          <view class="participant-avatar {{item.gender === '女' ? 'female' : 'male'}}">
+            {{item.name ? item.name[0] : '?'}}
+          </view>
+          <view class="participant-info">
+            <view class="participant-name">{{item.name || '匿名用户'}}</view>
+            <view class="participant-meta">
+              <text class="gender-tag {{item.gender}}">{{item.gender}}</text>
+              <text>{{item.department || ''}}</text>
+              <text wx:if="{{item.skillLevel}}">· {{item.skillLevel}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer-bar">
+      <view class="favorite-btn {{isFavorited ? 'favorited' : ''}}" bindtap="toggleFavorite">
+        <text>{{isFavorited ? '❤️' : '🤍'}}</text>
+      </view>
+      <view wx:if="{{isRegistered}}" class="btn-cancel" bindtap="cancelRegistration">取消报名</view>
+      <view wx:else class="btn-register" bindtap="registerActivity">立即报名</view>
+    </view>
+  </block>
+</view>

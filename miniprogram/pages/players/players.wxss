@@ -1,0 +1,186 @@
+.container {
+  padding: 20rpx;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.filter-label {
+  font-size: 28rpx;
+  color: #666666;
+  margin-right: 20rpx;
+}
+
+.filter-picker {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.picker-arrow {
+  margin-left: 10rpx;
+  font-size: 20rpx;
+  color: #999999;
+}
+
+.stats-bar {
+  font-size: 26rpx;
+  color: #999999;
+  margin-bottom: 20rpx;
+  padding: 0 10rpx;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999999;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999999;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.player-list {
+  padding-bottom: 20rpx;
+}
+
+.player-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.player-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.player-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0ABAB5 0%, #4dd4cf 100%);
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 20rpx;
+}
+
+.player-info {
+  flex: 1;
+}
+
+.player-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 6rpx;
+}
+
+.player-dept {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.player-skill {
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.skill-beginner {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+
+.skill-intermediate {
+  background-color: #e6f7f7;
+  color: #0ABAB5;
+}
+
+.skill-advanced {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+
+.skill-professional {
+  background-color: #fff1f0;
+  color: #f5222d;
+}
+
+.player-detail {
+  display: flex;
+  padding: 16rpx 0;
+  border-top: 2rpx solid #f5f5f5;
+  border-bottom: 2rpx solid #f5f5f5;
+  margin-bottom: 16rpx;
+}
+
+.detail-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 6rpx;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  color: #333333;
+}
+
+.player-items {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.items-label {
+  font-size: 26rpx;
+  color: #666666;
+  margin-right: 10rpx;
+}
+
+.items-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.item-tag {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  background-color: #e6f7f7;
+  color: #0ABAB5;
+  border-radius: 6rpx;
+  font-size: 24rpx;
+}

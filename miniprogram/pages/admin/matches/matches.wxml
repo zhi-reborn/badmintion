@@ -1,0 +1,234 @@
+<view class="container">
+  <view class="tabs">
+    <view 
+      wx:for="{{tabs}}" 
+      wx:key="index" 
+      class="tab-item {{currentTab === index ? 'active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTabChange"
+    >
+      {{item}}
+    </view>
+  </view>
+
+  <view wx:if="{{currentTab === 0}}" class="tab-content">
+    <view class="action-bar">
+      <button class="btn-add" bindtap="showAddItemDialog">+ 添加比赛项目</button>
+    </view>
+
+    <view wx:if="{{matchItems.length === 0}}" class="empty-state">
+      <view class="empty-icon">🏆</view>
+      <text>暂无比赛项目</text>
+    </view>
+
+    <view wx:else class="item-list">
+      <view wx:for="{{matchItems}}" wx:key="_id" class="item-card">
+        <view class="item-header">
+          <view class="item-name">{{item.name}}</view>
+          <view class="item-status {{item.status === '报名中' ? 'status-registering' : item.status === '进行中' ? 'status-ongoing' : 'status-finished'}}">
+            {{item.status}}
+          </view>
+        </view>
+        <view wx:if="{{item.description}}" class="item-desc">{{item.description}}</view>
+        <view class="item-actions">
+          <button class="btn-manage" data-id="{{item._id}}" bindtap="goToMatchItemManage">管理</button>
+          <button class="btn-delete" data-id="{{item._id}}" bindtap="deleteItem">删除</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{currentTab === 1}}" class="tab-content">
+    <view class="action-bar">
+      <button class="btn-add" bindtap="showAddMatchDialog">+ 录入比赛结果</button>
+    </view>
+
+    <view class="section-title">已录入的比赛结果</view>
+    
+    <view wx:if="{{matchResults.length === 0}}" class="empty-state">
+      <view class="empty-icon">📋</view>
+      <text>暂无比赛结果</text>
+    </view>
+
+    <view wx:else class="result-list">
+      <view wx:for="{{matchResults}}" wx:key="_id" class="result-card">
+        <view class="result-header">
+          <view class="result-project">{{item.itemName || '比赛'}}</view>
+          <view class="result-round">{{item.round || ''}}</view>
+        </view>
+        <view class="result-content">
+          <view class="result-team {{item.winner === 1 ? 'winner' : ''}}">
+            <view class="team-name">{{item.team1Name || '队伍1'}}</view>
+            <view class="team-score">{{item.score1 || 0}}</view>
+          </view>
+          <view class="result-vs">VS</view>
+          <view class="result-team {{item.winner === 2 ? 'winner' : ''}}">
+            <view class="team-score">{{item.score2 || 0}}</view>
+            <view class="team-name">{{item.team2Name || '队伍2'}}</view>
+          </view>
+        </view>
+        <view class="result-footer">
+          <view class="result-winner">🏆 {{item.winner === 1 ? item.team1Name : item.team2Name}} 获胜</view>
+          <view class="result-actions">
+            <button class="btn-delete-small" data-id="{{item._id}}" bindtap="deleteMatch">删除</button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showAddItemModal}}" class="modal-mask" catchtap="closeItemModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">添加比赛项目</text>
+        <text class="modal-close" bindtap="closeItemModal">×</text>
+      </view>
+      
+      <view class="modal-body">
+        <view class="form-item">
+          <view class="form-label">项目名称 <text class="required">*</text></view>
+          <view class="preset-items">
+            <view 
+              wx:for="{{presetItems}}" 
+              wx:key="index" 
+              class="preset-item {{newItem.name === item ? 'active' : ''}}"
+              data-name="{{item}}"
+              bindtap="selectPresetItem"
+            >
+              {{item}}
+            </view>
+          </view>
+          <input class="form-input" placeholder="或自定义项目名称" value="{{newItem.name}}" bindinput="onItemNameInput" />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">状态</view>
+          <picker mode="selector" range="{{statusOptions}}" value="{{statusIndex}}" bindchange="onItemStatusChange">
+            <view class="form-picker">
+              <text>{{statusOptions[statusIndex]}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">描述</view>
+          <textarea class="form-textarea" placeholder="比赛说明（选填）" value="{{newItem.description}}" bindinput="onItemDescInput" />
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="closeItemModal">取消</button>
+        <button class="btn-confirm" bindtap="saveItem">确定</button>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showAddMatchModal}}" class="modal-mask" catchtap="closeMatchModal">
+    <view class="modal-content modal-large" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">录入比赛结果</text>
+        <text class="modal-close" bindtap="closeMatchModal">×</text>
+      </view>
+      
+      <scroll-view scroll-y class="modal-body">
+        <view class="form-item">
+          <view class="form-label">比赛项目 <text class="required">*</text></view>
+          <picker mode="selector" range="{{matchItems}}" range-key="name" bindchange="onMatchItemChange">
+            <view class="form-picker">
+              <text>{{newMatch.itemName || '请选择'}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">轮次</view>
+          <picker mode="selector" range="{{roundOptions}}" value="{{roundIndex}}" bindchange="onRoundChange">
+            <view class="form-picker">
+              <text>{{roundOptions[roundIndex]}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">队伍1选手 <text class="required">*</text></view>
+          <input class="form-input search-input" placeholder="输入姓名搜索选手" value="{{searchKeyword1}}" bindinput="onSearchPlayer1" />
+          <view class="selected-players" wx:if="{{team1Players.length > 0}}">
+            <text>已选：</text>
+            <view class="selected-player-tags">
+              <view wx:for="{{team1Players}}" wx:key="id" class="selected-tag">
+                {{item.name}}
+                <text class="remove-tag" data-index="{{index}}" bindtap="removeTeam1Player">×</text>
+              </view>
+            </view>
+          </view>
+          <view class="player-select-list">
+            <view wx:if="{{filteredPlayers1.length === 0}}" class="empty-tip">暂无匹配选手</view>
+            <view wx:for="{{filteredPlayers1}}" wx:key="_id" class="player-checkbox {{team1PlayerIds.indexOf(item._id) >= 0 ? 'checked' : ''}}" data-player="{{item}}" bindtap="toggleTeam1Player">
+              <view class="checkbox-icon">{{team1PlayerIds.indexOf(item._id) >= 0 ? '✓' : ''}}</view>
+              <view class="player-info">
+                <text class="player-name">{{item.name}}</text>
+                <text class="player-skill">{{item.skillLevel || '中级'}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">队伍1得分</view>
+          <input class="form-input" type="number" placeholder="0" value="{{newMatch.score1}}" bindinput="onScore1Input" />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">队伍2选手 <text class="required">*</text></view>
+          <input class="form-input search-input" placeholder="输入姓名搜索选手" value="{{searchKeyword2}}" bindinput="onSearchPlayer2" />
+          <view class="selected-players" wx:if="{{team2Players.length > 0}}">
+            <text>已选：</text>
+            <view class="selected-player-tags">
+              <view wx:for="{{team2Players}}" wx:key="id" class="selected-tag">
+                {{item.name}}
+                <text class="remove-tag" data-index="{{index}}" bindtap="removeTeam2Player">×</text>
+              </view>
+            </view>
+          </view>
+          <view class="player-select-list">
+            <view wx:if="{{filteredPlayers2.length === 0}}" class="empty-tip">暂无匹配选手</view>
+            <view wx:for="{{filteredPlayers2}}" wx:key="_id" class="player-checkbox {{team2PlayerIds.indexOf(item._id) >= 0 ? 'checked' : ''}}" data-player="{{item}}" bindtap="toggleTeam2Player">
+              <view class="checkbox-icon">{{team2PlayerIds.indexOf(item._id) >= 0 ? '✓' : ''}}</view>
+              <view class="player-info">
+                <text class="player-name">{{item.name}}</text>
+                <text class="player-skill">{{item.skillLevel || '中级'}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">队伍2得分</view>
+          <input class="form-input" type="number" placeholder="0" value="{{newMatch.score2}}" bindinput="onScore2Input" />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">获胜方</view>
+          <radio-group bindchange="onWinnerChange">
+            <label class="radio-item">
+              <radio value="1" checked="{{newMatch.winner === 1}}" />
+              <text>队伍1</text>
+            </label>
+            <label class="radio-item">
+              <radio value="2" checked="{{newMatch.winner === 2}}" />
+              <text>队伍2</text>
+            </label>
+          </radio-group>
+        </view>
+      </scroll-view>
+
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="closeMatchModal">取消</button>
+        <button class="btn-confirm" bindtap="saveMatch">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

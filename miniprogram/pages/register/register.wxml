@@ -1,0 +1,95 @@
+<view class="container">
+  <view class="form-section">
+    <view class="form-title">填写报名信息</view>
+    
+    <view class="form-item">
+      <view class="form-label">姓名 <text class="required">*</text></view>
+      <input class="form-input" placeholder="请输入姓名" data-field="name" value="{{formData.name}}" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">联系电话 <text class="required">*</text></view>
+      <input class="form-input" type="number" placeholder="请输入手机号" data-field="phone" value="{{formData.phone}}" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">部门</view>
+      <input class="form-input" placeholder="请输入部门（选填）" data-field="department" value="{{formData.department}}" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">性别</view>
+      <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+        <view class="form-picker">
+          <text>{{genderOptions[genderIndex]}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">技术水平</view>
+      <picker mode="selector" range="{{skillOptions}}" value="{{skillIndex}}" bindchange="onSkillChange">
+        <view class="form-picker">
+          <text>{{skillOptions[skillIndex]}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">选择活动 <text class="required">*</text></view>
+      <view class="activity-select">
+        <view wx:if="{{activities.length === 0}}" class="empty-tip">
+          暂无可报名的活动，请先在管理后台发布活动
+        </view>
+        <block wx:else>
+          <checkbox-group bindchange="onActivityChange">
+            <label class="activity-item" wx:for="{{activities}}" wx:key="_id">
+              <checkbox value="{{item._id}}" color="#0ABAB5" />
+              <view class="activity-content">
+                <view class="activity-title">{{item.title}}</view>
+                <view class="activity-desc">{{item.type}} | {{item.currentCount || 0}}/{{item.maxCount || '不限'}}人</view>
+              </view>
+            </label>
+          </checkbox-group>
+        </block>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">参赛项目</view>
+      <view class="match-items-select">
+        <view wx:for="{{matchItems}}" wx:key="id" class="match-item-tag {{item.checked ? 'checked' : ''}}" data-id="{{item.id}}" bindtap="toggleMatchItem">
+          {{item.name}}
+        </view>
+      </view>
+    </view>
+
+    <view class="form-actions">
+      <button class="btn-cancel" bindtap="cancelForm">取消</button>
+      <button class="btn-submit" bindtap="submitRegistration">提交报名</button>
+    </view>
+  </view>
+
+  <view class="my-registrations" wx:if="{{myRegistrations.length > 0}}">
+    <view class="section-title">我的报名记录</view>
+    <view class="registration-list">
+      <view wx:for="{{myRegistrations}}" wx:key="_id" class="registration-card">
+        <view class="reg-header">
+          <view class="reg-name">{{item.name}}</view>
+        </view>
+        <view class="reg-info">
+          <text>部门: {{item.department}}</text>
+          <text>活动: {{item.activityNames || '未选择'}}</text>
+        </view>
+        <view class="reg-items" wx:if="{{item.items.length > 0}}">
+          <text wx:for="{{item.items}}" wx:for-item="matchItem" wx:key="*this" class="item-tag">{{matchItem}}</text>
+        </view>
+        <view class="card-actions">
+          <button class="btn-cancel-small" data-id="{{item._id}}" bindtap="cancelRegistration">取消报名</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

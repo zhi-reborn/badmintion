@@ -1,0 +1,76 @@
+<view class="container">
+  <view class="header">
+    <view class="header-content">
+      <view class="header-title">🏸 羽毛球活动</view>
+      <view class="header-subtitle">公司羽毛球协会</view>
+    </view>
+  </view>
+
+  <view class="stats-section">
+    <view class="stat-item">
+      <view class="stat-number">{{matchStats.totalPlayers}}</view>
+      <view class="stat-label">报名人数</view>
+    </view>
+    <view class="stat-item">
+      <view class="stat-number">{{matchStats.totalMatches}}</view>
+      <view class="stat-label">比赛场次</view>
+    </view>
+    <view class="stat-item">
+      <view class="stat-number">{{matchStats.ongoingItems}}</view>
+      <view class="stat-label">进行中</view>
+    </view>
+  </view>
+
+  <view class="quick-actions">
+    <view 
+      wx:for="{{quickActions}}" 
+      wx:key="name" 
+      class="action-item" 
+      data-url="{{item.url}}"
+      bindtap="goToQuickAction"
+    >
+      <view class="action-icon">{{item.icon}}</view>
+      <view class="action-text">{{item.name}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-header">
+      <view class="section-title">🔥 热门活动</view>
+      <view class="section-more" bindtap="goToQuickAction" data-url="/pages/activities/activities">更多 ›</view>
+    </view>
+    <view wx:if="{{hotActivities.length === 0}}" class="empty-tip">暂无活动</view>
+    <view wx:else class="activity-list">
+      <view wx:for="{{hotActivities}}" wx:key="_id" class="activity-item" data-id="{{item._id}}" bindtap="goToActivityDetail">
+        <view class="activity-type {{item.type === '比赛' ? 'type-match' : item.type === '约球' ? 'type-play' : 'type-train'}}">
+          {{item.type}}
+        </view>
+        <view class="activity-content">
+          <view class="activity-title">{{item.title}}</view>
+          <view class="activity-meta">
+            <text class="meta-item">📍 {{item.venue || '待定'}}</text>
+            <text class="meta-item">👥 {{item.currentCount || 0}}/{{item.maxCount}}人</text>
+          </view>
+        </view>
+        <view class="activity-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-header">
+      <view class="section-title">📢 公告</view>
+    </view>
+    <view class="notice-item">
+      <view class="notice-title">欢迎参加公司羽毛球活动</view>
+      <view class="notice-content">请各位同事积极报名参加，锻炼身体！报名后可在每个活动中查看所有报名选手信息。</view>
+      <view class="notice-time">2026-03-15</view>
+    </view>
+  </view>
+
+  <view wx:if="{{isAdmin}}" class="admin-entry" bindtap="goToAdmin">
+    <view class="admin-icon">⚙️</view>
+    <view class="admin-text">管理后台</view>
+    <view class="admin-arrow">›</view>
+  </view>
+</view>

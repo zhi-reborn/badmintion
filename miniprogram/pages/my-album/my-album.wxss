@@ -1,0 +1,85 @@
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.header {
+  padding: 20rpx;
+  background-color: #ffffff;
+}
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+  background-color: #e6f7f7;
+  border-radius: 16rpx;
+  border: 2rpx dashed #0ABAB5;
+}
+
+.upload-icon {
+  font-size: 40rpx;
+  color: #0ABAB5;
+  margin-right: 12rpx;
+}
+
+.upload-text {
+  font-size: 28rpx;
+  color: #0ABAB5;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999999;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-tip {
+  font-size: 26rpx;
+  color: #cccccc;
+  margin-top: 16rpx;
+}
+
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10rpx;
+}
+
+.photo-item {
+  width: calc(33.33% - 20rpx);
+  margin: 10rpx;
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.photo-img {
+  width: 100%;
+  height: 200rpx;
+}
+
+.photo-info {
+  padding: 12rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.photo-time {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.photo-delete {
+  font-size: 22rpx;
+  color: #ff4d4f;
+  padding: 4rpx 12rpx;
+}

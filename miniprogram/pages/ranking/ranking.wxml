@@ -1,0 +1,84 @@
+<view class="container">
+  <view class="header">
+    <view class="header-top">
+      <view class="back-btn" bindtap="goToHome">
+        <text>← 首页</text>
+      </view>
+      <view class="header-title">🏆 积分排行榜</view>
+      <view class="header-placeholder"></view>
+    </view>
+    <view class="type-tabs">
+      <view 
+        wx:for="{{types}}" 
+        wx:key="key" 
+        class="type-tab {{currentType === item.key ? 'active' : ''}}"
+        data-type="{{item.key}}"
+        bindtap="onTypeChange"
+      >
+        {{item.name}}
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{rankings.length === 0}}" class="empty-state">
+    <view class="empty-icon">📊</view>
+    <text>暂无排名数据</text>
+  </view>
+
+  <view wx:else class="ranking-list">
+    <view wx:for="{{rankings}}" wx:key="_id" class="ranking-item {{index < 3 ? 'top-three' : ''}}">
+      <view class="rank-number {{index === 0 ? 'rank-first' : index === 1 ? 'rank-second' : index === 2 ? 'rank-third' : ''}}">
+        <text wx:if="{{index < 3}}" class="medal">{{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}}</text>
+        <text wx:else>{{index + 1}}</text>
+      </view>
+      <view class="player-info">
+        <view class="player-avatar">{{item.playerName ? item.playerName[0] : '?'}}</view>
+        <view class="player-detail">
+          <view class="player-name">{{item.playerName || '未知选手'}}</view>
+          <view class="player-stats">
+            <text>{{item.total || 0}}积分</text>
+            <text>·</text>
+            <text>{{item.win || 0}}胜</text>
+            <text>·</text>
+            <text>{{item.match || 0}}场</text>
+          </view>
+        </view>
+      </view>
+      <view class="player-score">
+        <text class="score-value">{{currentType === 'total' ? item.total : currentType === 'win' ? item.win : item.match}}</text>
+        <text class="score-label">{{currentType === 'total' ? '积分' : currentType === 'win' ? '胜场' : '场次'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">📋 最近比赛结果</view>
+    <view wx:if="{{matchResults.length === 0}}" class="empty-tip">暂无比赛结果</view>
+    <view wx:else class="match-list">
+      <view wx:for="{{matchResults}}" wx:key="_id" class="match-card">
+        <view class="match-header">
+          <view class="match-project">{{item.itemName || '比赛'}}</view>
+          <view class="match-round">{{item.round || ''}}</view>
+        </view>
+        <view class="match-content">
+          <view class="match-team {{item.winner === 1 ? 'winner' : ''}}">
+            <view class="team-name">{{item.team1Name || '队伍1'}}</view>
+            <view class="team-score">{{item.score1 || 0}}</view>
+          </view>
+          <view class="match-vs">VS</view>
+          <view class="match-team {{item.winner === 2 ? 'winner' : ''}}">
+            <view class="team-score">{{item.score2 || 0}}</view>
+            <view class="team-name">{{item.team2Name || '队伍2'}}</view>
+          </view>
+        </view>
+        <view class="match-footer">
+          <view class="match-winner">🏆 {{item.winner === 1 ? item.team1Name : item.team2Name}} 获胜</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

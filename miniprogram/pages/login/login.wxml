@@ -1,0 +1,17 @@
+<view class="container">
+  <view class="login-card">
+    <view class="logo">🏸</view>
+    <view class="title">羽毛球活动</view>
+    <view class="subtitle">欢迎使用</view>
+    
+    <view class="form-section">
+      <view class="input-row">
+        <input class="input" type="text" placeholder="请输入用户名" bindinput="onNameInput" value="{{name}}" />
+      </view>
+      <view class="input-row">
+        <input class="input" type="number" placeholder="请输入手机号" bindinput="onPhoneInput" value="{{phone}}" maxlength="11" />
+      </view>
+      <button class="submit-btn" bindtap="doLogin">登录</button>
+    </view>
+  </view>
+</view>

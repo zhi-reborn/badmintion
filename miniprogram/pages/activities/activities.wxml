@@ -1,0 +1,68 @@
+<view class="container">
+  <view class="header">
+    <view class="header-top">
+      <view class="back-btn" bindtap="goToHome">
+        <text>← 首页</text>
+      </view>
+      <view class="header-title">活动中心</view>
+      <view class="header-placeholder"></view>
+    </view>
+    <view class="type-tabs">
+      <view 
+        wx:for="{{types}}" 
+        wx:key="index" 
+        class="type-tab {{currentType === item ? 'active' : ''}}"
+        data-type="{{item}}"
+        bindtap="onTypeChange"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{activities.length === 0}}" class="empty-state">
+    <view class="empty-icon">📅</view>
+    <text>暂无活动</text>
+  </view>
+
+  <view wx:else class="activity-list">
+    <view wx:for="{{activities}}" wx:key="_id" class="activity-card" data-id="{{item._id}}" bindtap="goToActivityDetail">
+      <view class="activity-header">
+        <view class="activity-type {{item.type === '比赛' ? 'type-match' : item.type === '约球' ? 'type-play' : 'type-train'}}">
+          {{item.type}}
+        </view>
+        <view class="activity-status {{item.status === '报名中' ? 'status-open' : 'status-ongoing'}}">
+          {{item.status}}
+        </view>
+      </view>
+      
+      <view class="activity-title">{{item.title}}</view>
+      
+      <view class="activity-info">
+        <view class="info-item">
+          <text class="info-icon">📍</text>
+          <text>{{item.venue || '待定'}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-icon">🕐</text>
+          <text>{{item.time}}</text>
+        </view>
+      </view>
+      
+      <view class="activity-footer">
+        <view class="participant-info">
+          <text class="participant-count">{{item.currentCount || 0}}/{{item.maxCount}}</text>
+          <text class="participant-label">人已报名</text>
+        </view>
+        <view class="activity-fee">
+          <text class="fee-value">¥{{item.fee || 0}}</text>
+          <text class="fee-label">/人</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

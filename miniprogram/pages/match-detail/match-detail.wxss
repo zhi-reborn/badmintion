@@ -1,0 +1,328 @@
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-state {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #999999;
+}
+
+.header-card {
+  background: linear-gradient(135deg, #0ABAB5 0%, #0ccec8 100%);
+  padding: 40rpx 30rpx;
+  color: #ffffff;
+}
+
+.item-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  margin-bottom: 16rpx;
+}
+
+.item-status {
+  display: inline-block;
+  padding: 8rpx 24rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  margin-bottom: 16rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.status-registering {
+  background-color: rgba(24, 144, 255, 0.3);
+}
+
+.status-ongoing {
+  background-color: rgba(250, 140, 22, 0.3);
+}
+
+.status-finished {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.item-desc {
+  font-size: 26rpx;
+  opacity: 0.9;
+  margin-bottom: 20rpx;
+  line-height: 1.6;
+}
+
+.item-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.2);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+.tabs {
+  display: flex;
+  background-color: #ffffff;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 28rpx 0;
+  font-size: 28rpx;
+  color: #666666;
+  position: relative;
+}
+
+.tab-item.active {
+  color: #0ABAB5;
+  font-weight: bold;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50rpx;
+  height: 6rpx;
+  background-color: #0ABAB5;
+  border-radius: 3rpx;
+}
+
+.swiper {
+  flex: 1;
+}
+
+.scroll-view {
+  height: 100%;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999999;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.player-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.player-item {
+  width: calc(33.33% - 14rpx);
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  padding: 24rpx 16rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.player-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0ABAB5 0%, #4dd4cf 100%);
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 12rpx;
+}
+
+.player-name {
+  font-size: 26rpx;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.player-skill {
+  font-size: 22rpx;
+  color: #0ABAB5;
+  background-color: #e6f7f7;
+  padding: 4rpx 12rpx;
+  border-radius: 10rpx;
+  display: inline-block;
+}
+
+.schedule-list {
+  padding-bottom: 20rpx;
+}
+
+.schedule-card {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.schedule-round {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.schedule-time {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.schedule-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+}
+
+.team {
+  flex: 1;
+  text-align: center;
+}
+
+.team text {
+  display: block;
+  font-size: 26rpx;
+  color: #333333;
+  margin-bottom: 6rpx;
+}
+
+.vs {
+  font-size: 24rpx;
+  color: #cccccc;
+  padding: 0 20rpx;
+}
+
+.schedule-status {
+  text-align: center;
+  padding: 8rpx 0;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  margin-top: 12rpx;
+}
+
+.status-pending {
+  background-color: #f0f0f0;
+  color: #999999;
+}
+
+.status-playing {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-finished {
+  background-color: #e6f7f7;
+  color: #0ABAB5;
+}
+
+.result-list {
+  padding-bottom: 20rpx;
+}
+
+.result-card {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.result-header {
+  margin-bottom: 16rpx;
+}
+
+.result-round {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+.result-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-content .team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+}
+
+.result-content .team.winner .team-players text {
+  color: #0ABAB5;
+  font-weight: bold;
+}
+
+.result-content .team.winner .team-score {
+  background-color: #0ABAB5;
+  color: #ffffff;
+}
+
+.result-content .team.loser .team-players text {
+  color: #999999;
+}
+
+.result-content .team.loser .team-score {
+  background-color: #f5f5f5;
+  color: #999999;
+}
+
+.team-players text {
+  display: block;
+  font-size: 26rpx;
+  margin-bottom: 4rpx;
+}
+
+.team-score {
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.result-content .vs {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #cccccc;
+}

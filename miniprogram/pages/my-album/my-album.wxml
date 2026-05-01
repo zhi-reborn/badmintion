@@ -1,0 +1,34 @@
+<view class="container">
+  <view class="header">
+    <view class="upload-btn" bindtap="chooseImage">
+      <text class="upload-icon">+</text>
+      <text class="upload-text">上传照片</text>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{photos.length === 0}}" class="empty-state">
+    <view class="empty-icon">📸</view>
+    <text>暂无照片</text>
+    <view class="empty-tip">点击上方按钮上传你的运动照片吧</view>
+  </view>
+
+  <view wx:else class="photo-grid">
+    <view wx:for="{{photos}}" wx:key="_id" class="photo-item">
+      <image 
+        class="photo-img" 
+        src="{{item.fileID}}" 
+        mode="aspectFill"
+        data-url="{{item.fileID}}"
+        bindtap="previewImage"
+      />
+      <view class="photo-info">
+        <view class="photo-time">{{item.createTimeStr}}</view>
+        <view class="photo-delete" data-id="{{item._id}}" catchtap="deletePhoto">删除</view>
+      </view>
+    </view>
+  </view>
+</view>
