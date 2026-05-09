@@ -177,6 +177,16 @@
         </view>
 
         <view class="form-item">
+          <view class="form-label">队伍1部门 <text class="required">*</text></view>
+          <input class="form-input" placeholder="输入部门名称，可模糊搜索" value="{{newMatch.team1Department}}" bindinput="onTeam1DepartmentInput" />
+          <view class="department-suggestions" wx:if="{{filteredDepartments1.length > 0}}">
+            <view wx:for="{{filteredDepartments1}}" wx:key="*this" class="department-chip {{newMatch.team1Department === item ? 'active' : ''}}" data-department="{{item}}" bindtap="selectTeam1Department">
+              {{item}}
+            </view>
+          </view>
+        </view>
+
+        <view class="form-item">
           <view class="form-label">队伍1得分</view>
           <input class="form-input" type="number" placeholder="0" value="{{newMatch.score1}}" bindinput="onScore1Input" />
         </view>
@@ -201,6 +211,16 @@
                 <text class="player-name">{{item.name}}</text>
                 <text class="player-skill">{{item.skillLevel || '中级'}}</text>
               </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">队伍2部门 <text class="required">*</text></view>
+          <input class="form-input" placeholder="输入部门名称，可模糊搜索" value="{{newMatch.team2Department}}" bindinput="onTeam2DepartmentInput" />
+          <view class="department-suggestions" wx:if="{{filteredDepartments2.length > 0}}">
+            <view wx:for="{{filteredDepartments2}}" wx:key="*this" class="department-chip {{newMatch.team2Department === item ? 'active' : ''}}" data-department="{{item}}" bindtap="selectTeam2Department">
+              {{item}}
             </view>
           </view>
         </view>

@@ -1,6 +1,11 @@
 const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const {
+  filterRegistrationsForLogin,
+  getRegistrationForActivity,
+  buildActivitySelection
+} = require('../../utils/registration-flow');
 
 Page({
   data: {
@@ -28,10 +33,25 @@ Page({
     selectedItems: [],
     activities: [],
     selectedActivities: [],
-    myRegistrations: []
+    myRegistrations: [],
+    presetActivityId: '',
+    presetActivityName: ''
   },
 
-  onLoad: function () {
+  onLoad: function (options = {}) {
+    if (options.activityId) {
+      const activityId = decodeURIComponent(options.activityId);
+      const activityName = decodeURIComponent(options.activityName || '');
+
+      this.setData({
+        presetActivityId: activityId,
+        presetActivityName: activityName,
+        selectedActivities: [activityId],
+        'formData.activityIds': [activityId],
+        'formData.activityNames': activityName ? [activityName] : []
+      });
+    }
+
     this.loadActivities();
     this.loadMyRegistrations();
   },
@@ -50,8 +70,19 @@ Page({
         const activities = res.data.filter(item => 
           item.status === '报名中' || item.status === '进行中'
         );
-        console.log('可报名活动:', activities.length, activities);
-        that.setData({ activities: activities });
+        const selectedIds = that.data.formData.activityIds || [];
+        const selectedActivities = buildActivitySelection(activities, selectedIds);
+        const selectedActivityNames = selectedActivities
+          .filter(item => item.checked)
+          .map(item => item.title);
+
+        console.log('可报名活动:', selectedActivities.length, selectedActivities);
+        that.setData({
+          activities: selectedActivities,
+          'formData.activityNames': selectedActivityNames.length > 0
+            ? selectedActivityNames
+            : that.data.formData.activityNames
+        });
       })
       .catch(err => {
         console.error('加载活动列表失败', err);
@@ -63,6 +94,11 @@ Page({
   },
 
   loadMyRegistrations: function () {
+    if (!app.isLoggedIn()) {
+      this.setData({ myRegistrations: [] });
+      return;
+    }
+
     app.getUserOpenId(openid => {
       if (!openid) return;
       
@@ -70,7 +106,7 @@ Page({
         _openid: openid
       }).orderBy('createTime', 'desc').get().then(res => {
         this.setData({
-          myRegistrations: res.data
+          myRegistrations: filterRegistrationsForLogin(res.data, app.getLoginInfo())
         });
       }).catch(err => {
         console.error('加载我的报名记录失败', err);
@@ -127,12 +163,14 @@ Page({
     const selectedActivityNames = activities
       .filter(a => selectedIds.indexOf(a._id) >= 0)
       .map(a => a.title);
+    const nextActivities = buildActivitySelection(activities, selectedIds);
     
     console.log('选中的活动ID:', selectedIds);
     console.log('选中的活动名称:', selectedActivityNames);
     
     this.setData({
       selectedActivities: selectedActivities,
+      activities: nextActivities,
       'formData.activityIds': selectedIds,
       'formData.activityNames': selectedActivityNames
     });
@@ -154,12 +192,17 @@ Page({
       skillIndex: 1,
       matchItems: this.data.matchItems.map(item => ({ ...item, checked: false })),
       selectedItems: [],
-      selectedActivities: []
+      selectedActivities: [],
+      activities: buildActivitySelection(this.data.activities, [])
     });
   },
 
+  hasDuplicateRegistration: function (activityIds) {
+    return activityIds.some(activityId => getRegistrationForActivity(this.data.myRegistrations, activityId));
+  },
+
   validateForm: function () {
-    const { name, phone, activityIds } = this.data.formData;
+    const { name, phone, department, gender, activityIds } = this.data.formData;
     
     if (!name || !name.trim()) {
       wx.showToast({ title: '请输入姓名', icon: 'none' });
@@ -173,9 +216,21 @@ Page({
       wx.showToast({ title: '请输入正确的手机号', icon: 'none' });
       return false;
     }
+    if (!department || !department.trim()) {
+      wx.showToast({ title: '请输入部门', icon: 'none' });
+      return false;
+    }
+    if (!gender) {
+      wx.showToast({ title: '请选择性别', icon: 'none' });
+      return false;
+    }
 
     if (!activityIds || activityIds.length === 0) {
       wx.showToast({ title: '请至少选择一个活动', icon: 'none' });
+      return false;
+    }
+    if (this.hasDuplicateRegistration(activityIds)) {
+      wx.showToast({ title: '已报名过所选活动', icon: 'none' });
       return false;
     }
 
@@ -196,6 +251,8 @@ Page({
     const registrationData = {
       name: this.data.formData.name,
       phone: this.data.formData.phone,
+      userKey: app.getCurrentUserKey(),
+      loginName: (app.getLoginInfo() && app.getLoginInfo().nickName) || '',
       department: this.data.formData.department,
       gender: this.data.formData.gender,
       skillLevel: this.data.formData.skillLevel,

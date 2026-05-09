@@ -27,13 +27,42 @@ exports.main = async (event, context) => {
 
 async function addRegistration(data, openid) {
   try {
+    const registrationData = data || {};
+    const userKey = String(registrationData.userKey || registrationData.phone || '').trim();
+
+    if (!String(registrationData.department || '').trim()) {
+      return {
+        code: -1,
+        message: '请填写部门'
+      };
+    }
+
+    if (!registrationData.gender) {
+      return {
+        code: -1,
+        message: '请选择性别'
+      };
+    }
+
     const existResult = await db.collection('registrations')
       .where({
         _openid: openid
       })
       .get();
 
-    if (existResult.data.length > 0) {
+    const hasSameAccountRegistration = existResult.data.some(registration => {
+      const registrationUserKey = String(
+        registration.userKey ||
+        registration.loginPhone ||
+        registration.accountKey ||
+        registration.phone ||
+        ''
+      ).trim();
+
+      return registrationUserKey === userKey;
+    });
+
+    if (hasSameAccountRegistration) {
       return {
         code: -1,
         message: '您已报名，请勿重复报名'
@@ -42,7 +71,8 @@ async function addRegistration(data, openid) {
 
     const result = await db.collection('registrations').add({
       data: {
-        ...data,
+        ...registrationData,
+        userKey,
         _openid: openid,
         createTime: db.serverDate()
       }

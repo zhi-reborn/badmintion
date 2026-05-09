@@ -32,19 +32,70 @@
   width: 100rpx;
 }
 
-.type-tabs {
+.ranking-controls {
+  background-color: rgba(255, 255, 255, 0.18);
+  border-radius: 18rpx;
+  padding: 12rpx;
+}
+
+.mode-tabs {
   display: flex;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 40rpx;
+  background-color: rgba(255, 255, 255, 0.22);
+  border-radius: 14rpx;
   padding: 8rpx;
+}
+
+.mode-tab {
+  flex: 1;
+  text-align: center;
+  height: 68rpx;
+  line-height: 68rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.mode-tab.active {
+  background-color: #ffffff;
+  color: #0ABAB5;
+  box-shadow: 0 8rpx 18rpx rgba(0, 0, 0, 0.08);
+}
+
+.sort-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 14rpx;
+}
+
+.sort-label {
+  flex-shrink: 0;
+  width: 72rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  text-align: center;
+  border-radius: 24rpx;
+  font-size: 23rpx;
+  color: rgba(255, 255, 255, 0.88);
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+.type-tabs {
+  flex: 1;
+  display: flex;
+  gap: 10rpx;
 }
 
 .type-tab {
   flex: 1;
   text-align: center;
-  padding: 16rpx 0;
-  border-radius: 30rpx;
-  font-size: 26rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  border-radius: 24rpx;
+  font-size: 23rpx;
+  color: rgba(255, 255, 255, 0.88);
+  background-color: rgba(255, 255, 255, 0.14);
   transition: all 0.3s;
 }
 
@@ -117,6 +168,11 @@
   justify-content: center;
   align-items: center;
   margin-right: 20rpx;
+}
+
+.department-avatar {
+  border-radius: 18rpx;
+  background: linear-gradient(135deg, #2454a6 0%, #35a06f 100%);
 }
 
 .player-detail {

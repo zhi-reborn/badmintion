@@ -1,6 +1,9 @@
 const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const {
+  filterRegistrationsForLogin
+} = require('../../utils/registration-flow');
 
 Page({
   data: {
@@ -18,6 +21,18 @@ Page({
 
   loadMyActivities: function () {
     this.setData({ loading: true });
+
+    if (!app.isLoggedIn()) {
+      this.setData({
+        activities: [],
+        loading: false
+      });
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return;
+    }
     
     app.getUserOpenId(openid => {
       if (!openid) {
@@ -32,7 +47,9 @@ Page({
       db.collection('registrations').where({
         _openid: openid
       }).get().then(res => {
-        if (res.data.length === 0) {
+        const registrations = filterRegistrationsForLogin(res.data, app.getLoginInfo());
+
+        if (registrations.length === 0) {
           this.setData({
             activities: [],
             loading: false
@@ -40,8 +57,9 @@ Page({
           return;
         }
 
-        const registration = res.data[0];
-        const activityIds = registration.activityIds || [];
+        const activityIds = Array.from(new Set(
+          registrations.reduce((ids, registration) => ids.concat(registration.activityIds || []), [])
+        ));
         
         if (activityIds.length === 0) {
           this.setData({
@@ -56,7 +74,9 @@ Page({
         }).orderBy('createTime', 'desc').get().then(actRes => {
           const activities = actRes.data.map(act => ({
             ...act,
-            registerTime: this.formatTime(registration.createTime)
+            registerTime: this.formatTime(
+              (registrations.find(registration => (registration.activityIds || []).includes(act._id)) || {}).createTime
+            )
           }));
           this.setData({
             activities: activities,

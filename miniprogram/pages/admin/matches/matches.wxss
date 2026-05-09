@@ -277,6 +277,28 @@
   font-size: 28rpx;
 }
 
+.department-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.department-chip {
+  padding: 10rpx 20rpx;
+  border-radius: 999rpx;
+  background-color: #f0f5f5;
+  color: #4b6664;
+  font-size: 24rpx;
+  border: 2rpx solid transparent;
+}
+
+.department-chip.active {
+  background-color: #e6f7f7;
+  color: #0ABAB5;
+  border-color: #0ABAB5;
+}
+
 .picker-arrow {
   font-size: 24rpx;
   color: #999999;

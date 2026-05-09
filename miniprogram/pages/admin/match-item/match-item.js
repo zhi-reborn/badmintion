@@ -1,12 +1,19 @@
 const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const {
+  getDepartmentOptions,
+  filterDepartmentOptions
+} = require('../../../utils/ranking');
 
 Page({
   data: {
     itemId: '',
     itemInfo: null,
     players: [],
+    departmentOptions: [],
+    resultFilteredDepartments1: [],
+    resultFilteredDepartments2: [],
     showAddSchedule: false,
     showAddResult: false,
     scheduleForm: {
@@ -20,6 +27,8 @@ Page({
       round: '第1轮',
       team1: [],
       team2: [],
+      team1Department: '',
+      team2Department: '',
       score1: 0,
       score2: 0,
       winner: 1
@@ -64,7 +73,13 @@ Page({
     db.collection('registrations').where({
       items: _.in([this.data.itemInfo.name])
     }).get().then(res => {
-      this.setData({ players: res.data });
+      const departmentOptions = getDepartmentOptions(res.data);
+      this.setData({
+        players: res.data,
+        departmentOptions: departmentOptions,
+        resultFilteredDepartments1: departmentOptions,
+        resultFilteredDepartments2: departmentOptions
+      });
     }).catch(err => {
       console.error('加载参赛选手失败', err);
     });
@@ -209,13 +224,17 @@ Page({
         round: '第1轮',
         team1: [],
         team2: [],
+        team1Department: '',
+        team2Department: '',
         score1: 0,
         score2: 0,
         winner: 1
       },
       roundIndex: 0,
       resultTeam1Display: '',
-      resultTeam2Display: ''
+      resultTeam2Display: '',
+      resultFilteredDepartments1: this.data.departmentOptions,
+      resultFilteredDepartments2: this.data.departmentOptions
     });
   },
 
@@ -238,6 +257,13 @@ Page({
       'resultForm.team1': selected.map(p => ({ id: p._id, name: p.name })),
       resultTeam1Display: selected.map(p => p.name).join('、')
     });
+
+    if (!this.data.resultForm.team1Department && selected[0] && selected[0].department) {
+      this.setData({
+        'resultForm.team1Department': selected[0].department,
+        resultFilteredDepartments1: filterDepartmentOptions(this.data.departmentOptions, selected[0].department)
+      });
+    }
   },
 
   onResultTeam2Change: function (e) {
@@ -246,6 +272,45 @@ Page({
     this.setData({
       'resultForm.team2': selected.map(p => ({ id: p._id, name: p.name })),
       resultTeam2Display: selected.map(p => p.name).join('、')
+    });
+
+    if (!this.data.resultForm.team2Department && selected[0] && selected[0].department) {
+      this.setData({
+        'resultForm.team2Department': selected[0].department,
+        resultFilteredDepartments2: filterDepartmentOptions(this.data.departmentOptions, selected[0].department)
+      });
+    }
+  },
+
+  onResultTeam1DepartmentInput: function (e) {
+    const value = e.detail.value;
+    this.setData({
+      'resultForm.team1Department': value,
+      resultFilteredDepartments1: filterDepartmentOptions(this.data.departmentOptions, value)
+    });
+  },
+
+  onResultTeam2DepartmentInput: function (e) {
+    const value = e.detail.value;
+    this.setData({
+      'resultForm.team2Department': value,
+      resultFilteredDepartments2: filterDepartmentOptions(this.data.departmentOptions, value)
+    });
+  },
+
+  selectResultTeam1Department: function (e) {
+    const department = e.currentTarget.dataset.department;
+    this.setData({
+      'resultForm.team1Department': department,
+      resultFilteredDepartments1: filterDepartmentOptions(this.data.departmentOptions, department)
+    });
+  },
+
+  selectResultTeam2Department: function (e) {
+    const department = e.currentTarget.dataset.department;
+    this.setData({
+      'resultForm.team2Department': department,
+      resultFilteredDepartments2: filterDepartmentOptions(this.data.departmentOptions, department)
     });
   },
 
@@ -275,6 +340,11 @@ Page({
       return;
     }
 
+    if (!resultForm.team1Department.trim() || !resultForm.team2Department.trim()) {
+      wx.showToast({ title: '请填写双方部门', icon: 'none' });
+      return;
+    }
+
     wx.showLoading({ title: '保存中...' });
 
     db.collection('matches').add({
@@ -286,6 +356,7 @@ Page({
         createTime: db.serverDate()
       }
     }).then(() => {
+      this.updateDepartmentRankings(resultForm);
       wx.hideLoading();
       wx.showToast({ title: '添加成功', icon: 'success' });
       this.closeResultModal();
@@ -293,6 +364,51 @@ Page({
     }).catch(err => {
       wx.hideLoading();
       wx.showToast({ title: '添加失败', icon: 'none' });
+    });
+  },
+
+  updateDepartmentRankings: function (match) {
+    [
+      { name: match.team1Department.trim(), isWinner: match.winner === 1 },
+      { name: match.team2Department.trim(), isWinner: match.winner === 2 }
+    ].forEach(department => {
+      this.updateDepartmentRanking(department.name, department.isWinner);
+    });
+  },
+
+  updateDepartmentRanking: function (departmentName, isWinner) {
+    db.collection('department_rankings').where({
+      departmentName: departmentName
+    }).get().then(res => {
+      if (res.data.length > 0) {
+        const record = res.data[0];
+        const updateData = {
+          match: (record.match || 0) + 1,
+          updateTime: db.serverDate()
+        };
+
+        if (isWinner) {
+          updateData.win = (record.win || 0) + 1;
+          updateData.total = (record.total || 0) + 1;
+        }
+
+        db.collection('department_rankings').doc(record._id).update({
+          data: updateData
+        });
+      } else {
+        db.collection('department_rankings').add({
+          data: {
+            departmentName: departmentName,
+            total: isWinner ? 1 : 0,
+            win: isWinner ? 1 : 0,
+            match: 1,
+            createTime: db.serverDate(),
+            updateTime: db.serverDate()
+          }
+        });
+      }
+    }).catch(err => {
+      console.error('更新部门排名失败', err);
     });
   },
 

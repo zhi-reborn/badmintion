@@ -13,12 +13,12 @@
     </view>
 
     <view class="form-item">
-      <view class="form-label">部门</view>
-      <input class="form-input" placeholder="请输入部门（选填）" data-field="department" value="{{formData.department}}" bindinput="onInputChange" />
+      <view class="form-label">部门 <text class="required">*</text></view>
+      <input class="form-input" placeholder="请输入部门" data-field="department" value="{{formData.department}}" bindinput="onInputChange" />
     </view>
 
     <view class="form-item">
-      <view class="form-label">性别</view>
+      <view class="form-label">性别 <text class="required">*</text></view>
       <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
         <view class="form-picker">
           <text>{{genderOptions[genderIndex]}}</text>
@@ -46,7 +46,7 @@
         <block wx:else>
           <checkbox-group bindchange="onActivityChange">
             <label class="activity-item" wx:for="{{activities}}" wx:key="_id">
-              <checkbox value="{{item._id}}" color="#0ABAB5" />
+              <checkbox value="{{item._id}}" checked="{{item.checked}}" color="#0ABAB5" />
               <view class="activity-content">
                 <view class="activity-title">{{item.title}}</view>
                 <view class="activity-desc">{{item.type}} | {{item.currentCount || 0}}/{{item.maxCount || '不限'}}人</view>

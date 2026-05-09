@@ -117,6 +117,185 @@
   line-height: 1.8;
 }
 
+.stats-block {
+  margin-top: 20rpx;
+}
+
+.stats-block:first-of-type {
+  margin-top: 0;
+}
+
+.stats-subtitle {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #444444;
+  margin-bottom: 14rpx;
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.stats-list.compact {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.stat-main {
+  width: 180rpx;
+  min-width: 0;
+}
+
+.stat-name {
+  display: block;
+  font-size: 26rpx;
+  color: #333333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stat-count {
+  display: block;
+  font-size: 22rpx;
+  color: #777777;
+  margin-top: 4rpx;
+}
+
+.stat-bar {
+  flex: 1;
+  height: 14rpx;
+  border-radius: 8rpx;
+  background-color: #edf1f1;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 8rpx;
+  background-color: #0ABAB5;
+}
+
+.stat-percent {
+  width: 70rpx;
+  font-size: 24rpx;
+  color: #666666;
+  text-align: right;
+}
+
+.gender-stat-card {
+  min-width: 150rpx;
+  padding: 18rpx 22rpx;
+  border-radius: 12rpx;
+  background-color: #f5fafa;
+  border: 2rpx solid #e4f1f0;
+}
+
+.gender-stat-name {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.gender-stat-count {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #0a8f8b;
+  margin-top: 8rpx;
+}
+
+.gender-stat-percent {
+  font-size: 22rpx;
+  color: #888888;
+  margin-top: 2rpx;
+}
+
+.draw-actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.draw-btn {
+  margin: 0;
+  padding: 0 18rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 12rpx;
+  background-color: #0ABAB5;
+  color: #ffffff;
+  font-size: 26rpx;
+}
+
+.draw-result {
+  margin-top: 22rpx;
+}
+
+.result-title {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 14rpx;
+}
+
+.department-match {
+  display: flex;
+  align-items: stretch;
+  gap: 12rpx;
+  margin-bottom: 14rpx;
+}
+
+.department-side {
+  flex: 1;
+  min-width: 0;
+  padding: 18rpx;
+  border-radius: 12rpx;
+  background-color: #f7f9fb;
+  border: 2rpx solid #edf1f5;
+}
+
+.department-side.muted {
+  color: #999999;
+  background-color: #fafafa;
+}
+
+.department-name {
+  display: block;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.department-count {
+  display: block;
+  font-size: 22rpx;
+  color: #777777;
+  margin-top: 6rpx;
+}
+
+.match-vs {
+  width: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12rpx;
+  background-color: #fff7e6;
+  color: #d46b08;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
 .empty-tip {
   text-align: center;
   padding: 30rpx 0;

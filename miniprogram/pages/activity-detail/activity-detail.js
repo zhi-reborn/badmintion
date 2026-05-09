@@ -1,6 +1,14 @@
 const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const {
+  buildRegistrationStats,
+  drawDepartmentMatches
+} = require('../../utils/competition');
+const {
+  getRegistrationForActivity,
+  getReusableRegistration
+} = require('../../utils/registration-flow');
 
 Page({
   data: {
@@ -9,7 +17,14 @@ Page({
     isRegistered: false,
     isFavorited: false,
     participants: [],
-    checkingStatus: true
+    checkingStatus: true,
+    registrationStats: {
+      total: 0,
+      departmentStats: [],
+      genderStats: []
+    },
+    departmentDraws: [],
+    drawGenerated: false
   },
 
   onLoad: function (options) {
@@ -45,6 +60,12 @@ Page({
 
   checkRegistrationStatus: function (activityId) {
     return new Promise((resolve) => {
+      if (!app.isLoggedIn()) {
+        this.setData({ isRegistered: false });
+        resolve(false);
+        return;
+      }
+
       app.getUserOpenId(openid => {
         if (!openid) {
           this.setData({ isRegistered: false });
@@ -55,16 +76,9 @@ Page({
         db.collection('registrations').where({
           _openid: openid
         }).get().then(res => {
-          if (res.data.length > 0) {
-            const registration = res.data[0];
-            const activityIds = registration.activityIds || [];
-            const isRegistered = activityIds.includes(activityId);
-            this.setData({ isRegistered: isRegistered });
-            resolve(isRegistered);
-          } else {
-            this.setData({ isRegistered: false });
-            resolve(false);
-          }
+          const isRegistered = Boolean(getRegistrationForActivity(res.data, activityId, app.getLoginInfo()));
+          this.setData({ isRegistered: isRegistered });
+          resolve(isRegistered);
         }).catch(err => {
           console.error('检查报名状态失败', err);
           this.setData({ isRegistered: false });
@@ -109,7 +123,7 @@ Page({
         activityIds: _.in([activityId])
       }).orderBy('createTime', 'desc').get().then(res => {
         console.log('加载报名人员成功', res.data.length);
-        this.setData({ participants: res.data });
+        this.setParticipantsData(res.data);
         resolve(res.data);
       }).catch(err => {
         console.error('加载报名人员失败', err);
@@ -127,9 +141,45 @@ Page({
       activityIds: _.in([this.data.activity._id])
     }).orderBy('createTime', 'desc').get().then(res => {
       console.log('加载报名人员成功', res.data.length);
-      this.setData({ participants: res.data });
+      this.setParticipantsData(res.data);
     }).catch(err => {
       console.error('加载报名人员失败', err);
+    });
+  },
+
+  setParticipantsData: function (participants) {
+    const safeParticipants = Array.isArray(participants) ? participants : [];
+
+    this.setData({
+      participants: safeParticipants,
+      registrationStats: buildRegistrationStats(safeParticipants),
+      departmentDraws: [],
+      drawGenerated: false
+    });
+  },
+
+  runDepartmentDraw: function () {
+    if (this.data.registrationStats.departmentStats.length < 2) {
+      wx.showToast({
+        title: '至少需要2个部门',
+        icon: 'none'
+      });
+      return;
+    }
+
+    this.setData({
+      departmentDraws: drawDepartmentMatches(this.data.participants),
+      drawGenerated: true
+    });
+  },
+
+  goToNewRegistration: function () {
+    const activity = this.data.activity || {};
+    const activityId = encodeURIComponent(activity._id || '');
+    const activityName = encodeURIComponent(activity.title || '');
+
+    wx.navigateTo({
+      url: `/pages/register/register?activityId=${activityId}&activityName=${activityName}`
     });
   },
 
@@ -172,43 +222,37 @@ Page({
       db.collection('registrations').where({
         _openid: openid
       }).get().then(res => {
-        if (res.data.length > 0) {
-          const registration = res.data[0];
-          const activityIds = registration.activityIds || [];
-          const activityNames = registration.activityNames || [];
-          
-          if (activityIds.includes(this.data.activity._id)) {
-            wx.showToast({ title: '您已报名此活动', icon: 'none' });
-            this.setData({ isRegistered: true });
-            return;
-          }
-
-          activityIds.push(this.data.activity._id);
-          activityNames.push(this.data.activity.title);
-
-          wx.showModal({
-            title: '确认报名',
-            content: `确定要报名"${this.data.activity.title}"吗？将使用您之前的信息：${registration.name}、${registration.phone}`,
-            success: modalRes => {
-              if (modalRes.confirm) {
-                this.doRegister(registration._id, activityIds, activityNames);
-              }
-            }
-          });
-        } else {
-          wx.showModal({
-            title: '需要完善报名信息',
-            content: '您还未填写过报名信息，是否现在去填写？',
-            confirmText: '去填写',
-            success: modalRes => {
-              if (modalRes.confirm) {
-                wx.navigateTo({
-                  url: '/pages/register/register'
-                });
-              }
-            }
-          });
+        if (getRegistrationForActivity(res.data, this.data.activity._id, app.getLoginInfo())) {
+          wx.showToast({ title: '您已报名此活动', icon: 'none' });
+          this.setData({ isRegistered: true });
+          return;
         }
+
+        const reusableRegistration = getReusableRegistration(res.data, app.getLoginInfo());
+
+        if (!reusableRegistration) {
+          this.goToNewRegistration();
+          return;
+        }
+
+        wx.showActionSheet({
+          itemList: ['使用历史信息报名', '重新填写信息报名'],
+          success: actionRes => {
+            if (actionRes.tapIndex === 0) {
+              const activityIds = (reusableRegistration.activityIds || []).slice();
+              const activityNames = (reusableRegistration.activityNames || []).slice();
+
+              activityIds.push(this.data.activity._id);
+              activityNames.push(this.data.activity.title);
+
+              this.doRegister(reusableRegistration._id, activityIds, activityNames);
+            }
+
+            if (actionRes.tapIndex === 1) {
+              this.goToNewRegistration();
+            }
+          }
+        });
       }).catch(err => {
         console.error('检查报名记录失败', err);
         wx.showToast({
@@ -271,15 +315,16 @@ Page({
               _openid: openid
             }).get().then(res => {
               if (res.data.length > 0) {
-                const registration = res.data[0];
-                const activityIds = registration.activityIds || [];
-                const activityNames = registration.activityNames || [];
-                
-                if (!activityIds.includes(this.data.activity._id)) {
+                const registration = getRegistrationForActivity(res.data, this.data.activity._id, app.getLoginInfo());
+
+                if (!registration) {
                   wx.showToast({ title: '您未报名此活动', icon: 'none' });
                   this.setData({ isRegistered: false });
                   return;
                 }
+
+                const activityIds = registration.activityIds || [];
+                const activityNames = registration.activityNames || [];
 
                 const newActivityIds = activityIds.filter(id => id !== this.data.activity._id);
                 const newActivityNames = activityNames.filter(name => name !== this.data.activity.title);

@@ -7,15 +7,31 @@
       <view class="header-title">🏆 积分排行榜</view>
       <view class="header-placeholder"></view>
     </view>
-    <view class="type-tabs">
-      <view 
-        wx:for="{{types}}" 
-        wx:key="key" 
-        class="type-tab {{currentType === item.key ? 'active' : ''}}"
-        data-type="{{item.key}}"
-        bindtap="onTypeChange"
-      >
-        {{item.name}}
+    <view class="ranking-controls">
+      <view class="mode-tabs">
+        <view
+          wx:for="{{modes}}"
+          wx:key="key"
+          class="mode-tab {{currentMode === item.key ? 'active' : ''}}"
+          data-mode="{{item.key}}"
+          bindtap="onModeChange"
+        >
+          {{item.name}}
+        </view>
+      </view>
+      <view class="sort-row">
+        <view class="sort-label">排序</view>
+        <view class="type-tabs">
+          <view
+            wx:for="{{types}}"
+            wx:key="key"
+            class="type-tab {{currentType === item.key ? 'active' : ''}}"
+            data-type="{{item.key}}"
+            bindtap="onTypeChange"
+          >
+            {{item.name}}
+          </view>
+        </view>
       </view>
     </view>
   </view>
@@ -35,19 +51,38 @@
         <text wx:if="{{index < 3}}" class="medal">{{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}}</text>
         <text wx:else>{{index + 1}}</text>
       </view>
-      <view class="player-info">
-        <view class="player-avatar">{{item.playerName ? item.playerName[0] : '?'}}</view>
-        <view class="player-detail">
-          <view class="player-name">{{item.playerName || '未知选手'}}</view>
-          <view class="player-stats">
-            <text>{{item.total || 0}}积分</text>
-            <text>·</text>
-            <text>{{item.win || 0}}胜</text>
-            <text>·</text>
-            <text>{{item.match || 0}}场</text>
+      <block wx:if="{{currentMode === 'department'}}">
+        <view class="player-info">
+          <view class="player-avatar department-avatar">{{item.departmentName ? item.departmentName[0] : '?'}}</view>
+          <view class="player-detail">
+            <view class="player-name">{{item.departmentName || '未知部门'}}</view>
+            <view class="player-stats">
+              <text>{{item.total || 0}}积分</text>
+              <text>·</text>
+              <text>{{item.win || 0}}胜</text>
+              <text>·</text>
+              <text>{{item.match || 0}}场</text>
+              <text>·</text>
+              <text>{{item.playerCount || 0}}人</text>
+            </view>
           </view>
         </view>
-      </view>
+      </block>
+      <block wx:else>
+        <view class="player-info">
+          <view class="player-avatar">{{item.playerName ? item.playerName[0] : '?'}}</view>
+          <view class="player-detail">
+            <view class="player-name">{{item.playerName || '未知选手'}}</view>
+            <view class="player-stats">
+              <text>{{item.total || 0}}积分</text>
+              <text>·</text>
+              <text>{{item.win || 0}}胜</text>
+              <text>·</text>
+              <text>{{item.match || 0}}场</text>
+            </view>
+          </view>
+        </view>
+      </block>
       <view class="player-score">
         <text class="score-value">{{currentType === 'total' ? item.total : currentType === 'win' ? item.win : item.match}}</text>
         <text class="score-label">{{currentType === 'total' ? '积分' : currentType === 'win' ? '胜场' : '场次'}}</text>

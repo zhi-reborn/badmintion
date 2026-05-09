@@ -50,6 +50,62 @@
       <view class="section-content">{{activity.description || '暂无详情'}}</view>
     </view>
 
+    <view class="section" wx:if="{{participants.length > 0}}">
+      <view class="section-title">报名统计</view>
+      <view class="stats-block">
+        <view class="stats-subtitle">部门维度</view>
+        <view class="stats-list">
+          <view wx:for="{{registrationStats.departmentStats}}" wx:key="name" class="stat-row">
+            <view class="stat-main">
+              <text class="stat-name">{{item.name}}</text>
+              <text class="stat-count">{{item.count}}人</text>
+            </view>
+            <view class="stat-bar">
+              <view class="stat-bar-fill" style="width: {{item.percent}}%;"></view>
+            </view>
+            <text class="stat-percent">{{item.percent}}%</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="stats-block">
+        <view class="stats-subtitle">性别维度</view>
+        <view class="stats-list compact">
+          <view wx:for="{{registrationStats.genderStats}}" wx:key="name" class="gender-stat-card">
+            <view class="gender-stat-name">{{item.name}}</view>
+            <view class="gender-stat-count">{{item.count}}人</view>
+            <view class="gender-stat-percent">{{item.percent}}%</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{participants.length > 0}}">
+      <view class="section-title">部门抽签</view>
+      <view class="draw-actions">
+        <button class="draw-btn" bindtap="runDepartmentDraw">部门抽签</button>
+      </view>
+
+      <view wx:if="{{departmentDraws.length > 0}}" class="draw-result">
+        <view class="result-title">部门抽签结果</view>
+        <view wx:for="{{departmentDraws}}" wx:key="round" class="department-match">
+          <view class="department-side">
+            <text class="department-name">{{item.departmentA.name}}</text>
+            <text class="department-count">{{item.departmentA.participantCount}}人</text>
+          </view>
+          <view class="match-vs">{{item.status === 'bye' ? '轮空' : 'VS'}}</view>
+          <view wx:if="{{item.departmentB}}" class="department-side">
+            <text class="department-name">{{item.departmentB.name}}</text>
+            <text class="department-count">{{item.departmentB.participantCount}}人</text>
+          </view>
+          <view wx:else class="department-side muted">
+            <text class="department-name">等待下一轮</text>
+          </view>
+        </view>
+      </view>
+
+    </view>
+
     <view class="section">
       <view class="section-title">已报名 ({{participants.length}}人)</view>
       <view wx:if="{{participants.length === 0}}" class="empty-tip">暂无报名</view>

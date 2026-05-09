@@ -1,6 +1,10 @@
 const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const {
+  getDepartmentOptions,
+  filterDepartmentOptions
+} = require('../../../utils/ranking');
 
 Page({
   data: {
@@ -8,6 +12,9 @@ Page({
     tabs: ['比赛项目', '录入结果'],
     matchItems: [],
     players: [],
+    departmentOptions: [],
+    filteredDepartments1: [],
+    filteredDepartments2: [],
     matchResults: [],
     showAddItemModal: false,
     showAddMatchModal: false,
@@ -24,6 +31,8 @@ Page({
       itemName: '',
       team1: [],
       team2: [],
+      team1Department: '',
+      team2Department: '',
       score1: 0,
       score2: 0,
       winner: 1,
@@ -74,8 +83,12 @@ Page({
       .get()
       .then(res => {
         console.log('加载选手列表成功', res.data.length);
+        const departmentOptions = getDepartmentOptions(res.data);
         this.setData({ 
           players: res.data,
+          departmentOptions: departmentOptions,
+          filteredDepartments1: departmentOptions,
+          filteredDepartments2: departmentOptions,
           filteredPlayers1: res.data,
           filteredPlayers2: res.data
         });
@@ -223,6 +236,8 @@ Page({
         itemName: '',
         team1: [],
         team2: [],
+        team1Department: '',
+        team2Department: '',
         score1: 0,
         score2: 0,
         winner: 1,
@@ -233,6 +248,8 @@ Page({
       team2PlayerIds: [],
       team1Players: [],
       team2Players: [],
+      filteredDepartments1: this.data.departmentOptions,
+      filteredDepartments2: this.data.departmentOptions,
       searchKeyword1: '',
       searchKeyword2: '',
       filteredPlayers1: this.data.players,
@@ -270,6 +287,38 @@ Page({
   onScore2Input: function (e) {
     this.setData({
       'newMatch.score2': parseInt(e.detail.value) || 0
+    });
+  },
+
+  onTeam1DepartmentInput: function (e) {
+    const value = e.detail.value;
+    this.setData({
+      'newMatch.team1Department': value,
+      filteredDepartments1: filterDepartmentOptions(this.data.departmentOptions, value)
+    });
+  },
+
+  onTeam2DepartmentInput: function (e) {
+    const value = e.detail.value;
+    this.setData({
+      'newMatch.team2Department': value,
+      filteredDepartments2: filterDepartmentOptions(this.data.departmentOptions, value)
+    });
+  },
+
+  selectTeam1Department: function (e) {
+    const department = e.currentTarget.dataset.department;
+    this.setData({
+      'newMatch.team1Department': department,
+      filteredDepartments1: filterDepartmentOptions(this.data.departmentOptions, department)
+    });
+  },
+
+  selectTeam2Department: function (e) {
+    const department = e.currentTarget.dataset.department;
+    this.setData({
+      'newMatch.team2Department': department,
+      filteredDepartments2: filterDepartmentOptions(this.data.departmentOptions, department)
     });
   },
 
@@ -315,15 +364,23 @@ Page({
       players.push({
         id: player._id,
         name: player.name,
-        openid: player._openid
+        openid: player._openid,
+        department: player.department || ''
       });
     }
-    
-    this.setData({
+
+    const nextData = {
       team1PlayerIds: ids,
       team1Players: players,
       'newMatch.team1': players
-    });
+    };
+
+    if (!this.data.newMatch.team1Department && player.department) {
+      nextData['newMatch.team1Department'] = player.department;
+      nextData.filteredDepartments1 = filterDepartmentOptions(this.data.departmentOptions, player.department);
+    }
+    
+    this.setData(nextData);
   },
 
   toggleTeam2Player: function (e) {
@@ -340,15 +397,23 @@ Page({
       players.push({
         id: player._id,
         name: player.name,
-        openid: player._openid
+        openid: player._openid,
+        department: player.department || ''
       });
     }
-    
-    this.setData({
+
+    const nextData = {
       team2PlayerIds: ids,
       team2Players: players,
       'newMatch.team2': players
-    });
+    };
+
+    if (!this.data.newMatch.team2Department && player.department) {
+      nextData['newMatch.team2Department'] = player.department;
+      nextData.filteredDepartments2 = filterDepartmentOptions(this.data.departmentOptions, player.department);
+    }
+    
+    this.setData(nextData);
   },
 
   removeTeam1Player: function (e) {
@@ -396,6 +461,14 @@ Page({
       return;
     }
 
+    if (!newMatch.team1Department.trim() || !newMatch.team2Department.trim()) {
+      wx.showToast({
+        title: '请填写双方部门',
+        icon: 'none'
+      });
+      return;
+    }
+
     wx.showLoading({ title: '保存中...' });
 
     const team1Names = newMatch.team1.map(p => p.name).join('、');
@@ -411,6 +484,7 @@ Page({
       }
     }).then(() => {
       this.updatePlayerRankings(newMatch);
+      this.updateDepartmentRankings(newMatch);
       wx.hideLoading();
       wx.showToast({
         title: '录入成功',
@@ -462,6 +536,59 @@ Page({
     });
   },
 
+  updateDepartmentRankings: function (match) {
+    const departments = [
+      {
+        name: match.team1Department.trim(),
+        isWinner: match.winner === 1
+      },
+      {
+        name: match.team2Department.trim(),
+        isWinner: match.winner === 2
+      }
+    ];
+
+    departments.forEach(department => {
+      this.updateDepartmentRanking(department.name, department.isWinner);
+    });
+  },
+
+  updateDepartmentRanking: function (departmentName, isWinner) {
+    db.collection('department_rankings').where({
+      departmentName: departmentName
+    }).get().then(res => {
+      if (res.data.length > 0) {
+        const record = res.data[0];
+        const updateData = {
+          match: (record.match || 0) + 1,
+          updateTime: db.serverDate()
+        };
+
+        if (isWinner) {
+          updateData.win = (record.win || 0) + 1;
+          updateData.total = (record.total || 0) + 1;
+        }
+
+        db.collection('department_rankings').doc(record._id).update({
+          data: updateData
+        });
+      } else {
+        db.collection('department_rankings').add({
+          data: {
+            departmentName: departmentName,
+            total: isWinner ? 1 : 0,
+            win: isWinner ? 1 : 0,
+            match: 1,
+            createTime: db.serverDate(),
+            updateTime: db.serverDate()
+          }
+        });
+      }
+    }).catch(err => {
+      console.error('更新部门排名失败', err);
+    });
+  },
+
   updatePlayerRanking: function (player, winnerTeam) {
     const isWinner = winnerTeam.some(p => p.id === player.id);
     
@@ -472,6 +599,7 @@ Page({
         const record = res.data[0];
         const updateData = {
           match: (record.match || 0) + 1,
+          department: player.department || record.department || '',
           updateTime: db.serverDate()
         };
         
@@ -489,6 +617,7 @@ Page({
             playerId: player.id,
             playerName: player.name,
             playerOpenid: player.openid,
+            department: player.department || '',
             total: isWinner ? 1 : 0,
             win: isWinner ? 1 : 0,
             match: 1,

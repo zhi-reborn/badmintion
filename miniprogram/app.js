@@ -40,13 +40,25 @@ App({
     return this.globalData.loginInfo;
   },
 
+  getCurrentUserKey: function() {
+    const loginInfo = this.getLoginInfo() || {};
+    return String(loginInfo.userKey || loginInfo.phone || loginInfo.nickName || loginInfo.name || '').trim();
+  },
+
   setLoginInfo: function(info) {
-    this.globalData.loginInfo = info;
-    wx.setStorageSync('loginInfo', info);
+    const loginInfo = {
+      ...info,
+      userKey: String(info && (info.userKey || info.phone || info.nickName || info.name) || '').trim()
+    };
+
+    this.globalData.loginInfo = loginInfo;
+    wx.setStorageSync('loginInfo', loginInfo);
   },
 
   clearLoginInfo: function() {
     this.globalData.loginInfo = null;
+    this.globalData.userInfo = null;
+    this.globalData.isAdmin = false;
     wx.removeStorageSync('loginInfo');
   },
 
