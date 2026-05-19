@@ -208,11 +208,7 @@ Page({
       wx.showToast({ title: '请输入姓名', icon: 'none' });
       return false;
     }
-    if (!phone || !phone.trim()) {
-      wx.showToast({ title: '请输入联系电话', icon: 'none' });
-      return false;
-    }
-    if (!/^1[3-9]\d{9}$/.test(phone)) {
+    if (phone && phone.trim() && !/^1[3-9]\d{9}$/.test(phone)) {
       wx.showToast({ title: '请输入正确的手机号', icon: 'none' });
       return false;
     }

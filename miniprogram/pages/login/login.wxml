@@ -9,7 +9,7 @@
         <input class="input" type="text" placeholder="请输入用户名" bindinput="onNameInput" value="{{name}}" />
       </view>
       <view class="input-row">
-        <input class="input" type="number" placeholder="请输入手机号" bindinput="onPhoneInput" value="{{phone}}" maxlength="11" />
+        <input class="input" type="number" placeholder="请输入手机号（选填）" bindinput="onPhoneInput" value="{{phone}}" maxlength="11" />
       </view>
       <button class="submit-btn" bindtap="doLogin">登录</button>
     </view>

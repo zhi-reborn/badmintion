@@ -90,7 +90,106 @@ function drawDepartmentMatches(participants = [], options = {}) {
   return matches;
 }
 
+function parseGroups(groupsText) {
+  if (!groupsText || typeof groupsText !== 'string') {
+    return [];
+  }
+
+  return groupsText
+    .split(',')
+    .map(name => name.trim())
+    .filter(name => name.length > 0);
+}
+
+function drawGroupMatches(participants = [], groupsText = '', options = {}) {
+  const validParticipants = Array.isArray(participants) ? participants : [];
+  const groupNames = parseGroups(groupsText);
+
+  if (groupNames.length === 0) {
+    return { groups: [], error: '请先设置分组名称' };
+  }
+
+  const shuffledParticipants = shuffle(validParticipants, options.random);
+  const groups = groupNames.map(name => ({
+    name,
+    participants: []
+  }));
+
+  shuffledParticipants.forEach((participant, index) => {
+    const groupIndex = index % groupNames.length;
+    groups[groupIndex].participants.push(participant);
+  });
+
+  return { groups, error: null };
+}
+
+function generateGroupBattles(groups = [], options = {}) {
+  const validGroups = Array.isArray(groups) ? groups : [];
+
+  if (validGroups.length < 2) {
+    return { battles: [], error: '至少需要2个分组才能生成对战' };
+  }
+
+  const shuffledGroups = shuffle(validGroups, options.random);
+  const battles = [];
+
+  for (let index = 0; index < shuffledGroups.length; index += 2) {
+    const groupA = shuffledGroups[index];
+    const groupB = shuffledGroups[index + 1] || null;
+
+    battles.push({
+      round: battles.length + 1,
+      groupA: {
+        name: groupA.name,
+        participantCount: groupA.participants.length
+      },
+      groupB: groupB ? {
+        name: groupB.name,
+        participantCount: groupB.participants.length
+      } : null,
+      status: groupB ? 'matched' : 'bye'
+    });
+  }
+
+  return { battles, error: null };
+}
+
+function generateDepartmentBattles(participants = [], options = {}) {
+  const validParticipants = Array.isArray(participants) ? participants : [];
+  const departments = getDepartmentEntries(validParticipants);
+
+  if (departments.length < 2) {
+    return { battles: [], error: '至少需要2个部门才能生成对战' };
+  }
+
+  const shuffledDepartments = shuffle(departments, options.random);
+  const battles = [];
+
+  for (let index = 0; index < shuffledDepartments.length; index += 2) {
+    const departmentA = shuffledDepartments[index];
+    const departmentB = shuffledDepartments[index + 1] || null;
+
+    battles.push({
+      round: battles.length + 1,
+      departmentA: {
+        name: departmentA.name,
+        participantCount: departmentA.participantCount
+      },
+      departmentB: departmentB ? {
+        name: departmentB.name,
+        participantCount: departmentB.participantCount
+      } : null,
+      status: departmentB ? 'matched' : 'bye'
+    });
+  }
+
+  return { battles, error: null };
+}
+
 module.exports = {
   buildRegistrationStats,
-  drawDepartmentMatches
+  drawDepartmentMatches,
+  drawGroupMatches,
+  generateGroupBattles,
+  generateDepartmentBattles
 };

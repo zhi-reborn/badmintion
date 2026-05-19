@@ -411,3 +411,114 @@
   font-weight: bold;
   border: 2rpx solid #ff4d4f;
 }
+
+.group-result {
+  margin-bottom: 20rpx;
+  padding: 16rpx;
+  border-radius: 12rpx;
+  background-color: #f7f9fb;
+  border: 2rpx solid #edf1f5;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 2rpx solid #e8ecef;
+}
+
+.group-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #0ABAB5;
+}
+
+.group-count {
+  font-size: 24rpx;
+  color: #777777;
+}
+
+.group-participants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.group-participant {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 12rpx;
+  border-radius: 8rpx;
+  background-color: #ffffff;
+  border: 1rpx solid #e8ecef;
+}
+
+.group-participant .participant-name {
+  font-size: 24rpx;
+  color: #333333;
+  margin-bottom: 0;
+}
+
+.group-participant .participant-dept {
+  font-size: 20rpx;
+  color: #888888;
+}
+
+.battle-section {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #e8ecef;
+}
+
+.battle-match {
+  display: flex;
+  align-items: stretch;
+  gap: 12rpx;
+  margin-bottom: 14rpx;
+}
+
+.battle-side {
+  flex: 1;
+  min-width: 0;
+  padding: 18rpx;
+  border-radius: 12rpx;
+  background-color: #f7f9fb;
+  border: 2rpx solid #edf1f5;
+}
+
+.battle-side.muted {
+  color: #999999;
+  background-color: #fafafa;
+}
+
+.battle-name {
+  display: block;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #0ABAB5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.battle-count {
+  display: block;
+  font-size: 22rpx;
+  color: #777777;
+  margin-top: 6rpx;
+}
+
+.battle-vs {
+  width: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12rpx;
+  background-color: #fff7e6;
+  color: #d46b08;
+  font-size: 24rpx;
+  font-weight: bold;
+}

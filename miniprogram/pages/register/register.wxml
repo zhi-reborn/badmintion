@@ -8,8 +8,8 @@
     </view>
 
     <view class="form-item">
-      <view class="form-label">联系电话 <text class="required">*</text></view>
-      <input class="form-input" type="number" placeholder="请输入手机号" data-field="phone" value="{{formData.phone}}" bindinput="onInputChange" />
+      <view class="form-label">联系电话</view>
+      <input class="form-input" type="number" placeholder="请输入手机号（选填）" data-field="phone" value="{{formData.phone}}" bindinput="onInputChange" />
     </view>
 
     <view class="form-item">

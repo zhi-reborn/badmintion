@@ -16,7 +16,8 @@ Page({
       time: '',
       maxCount: 20,
       fee: 0,
-      description: ''
+      description: '',
+      groups: ''
     },
     typeOptions: ['比赛', '约球', '训练'],
     typeIndex: 0,
@@ -69,7 +70,8 @@ Page({
         time: '',
         maxCount: 20,
         fee: 0,
-        description: ''
+        description: '',
+        groups: ''
       },
       typeIndex: 0,
       statusIndex: 0

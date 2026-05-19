@@ -3,7 +3,10 @@ const db = wx.cloud.database();
 const _ = db.command;
 const {
   buildRegistrationStats,
-  drawDepartmentMatches
+  drawDepartmentMatches,
+  drawGroupMatches,
+  generateGroupBattles,
+  generateDepartmentBattles
 } = require('../../utils/competition');
 const {
   getRegistrationForActivity,
@@ -24,7 +27,11 @@ Page({
       genderStats: []
     },
     departmentDraws: [],
-    drawGenerated: false
+    drawGenerated: false,
+    groupDraws: [],
+    groupDrawGenerated: false,
+    groupBattles: [],
+    groupBattleGenerated: false
   },
 
   onLoad: function (options) {
@@ -158,6 +165,41 @@ Page({
     });
   },
 
+  runGroupDraw: function () {
+    const groupsText = this.data.activity.groups || '';
+    
+    if (!groupsText.trim()) {
+      wx.showToast({
+        title: '请先设置分组名称',
+        icon: 'none'
+      });
+      return;
+    }
+
+    if (this.data.participants.length === 0) {
+      wx.showToast({
+        title: '暂无报名人员',
+        icon: 'none'
+      });
+      return;
+    }
+
+    const result = drawGroupMatches(this.data.participants, groupsText);
+    
+    if (result.error) {
+      wx.showToast({
+        title: result.error,
+        icon: 'none'
+      });
+      return;
+    }
+
+    this.setData({
+      groupDraws: result.groups,
+      groupDrawGenerated: true
+    });
+  },
+
   runDepartmentDraw: function () {
     if (this.data.registrationStats.departmentStats.length < 2) {
       wx.showToast({
@@ -170,6 +212,56 @@ Page({
     this.setData({
       departmentDraws: drawDepartmentMatches(this.data.participants),
       drawGenerated: true
+    });
+  },
+
+  runGroupBattle: function () {
+    if (this.data.groupDraws.length === 0) {
+      wx.showToast({
+        title: '请先进行分组抽签',
+        icon: 'none'
+      });
+      return;
+    }
+
+    const result = generateGroupBattles(this.data.groupDraws);
+
+    if (result.error) {
+      wx.showToast({
+        title: result.error,
+        icon: 'none'
+      });
+      return;
+    }
+
+    this.setData({
+      groupBattles: result.battles,
+      groupBattleGenerated: true
+    });
+  },
+
+  runDepartmentBattle: function () {
+    if (this.data.registrationStats.departmentStats.length < 2) {
+      wx.showToast({
+        title: '至少需要2个部门才能生成对战',
+        icon: 'none'
+      });
+      return;
+    }
+
+    const result = generateDepartmentBattles(this.data.participants);
+
+    if (result.error) {
+      wx.showToast({
+        title: result.error,
+        icon: 'none'
+      });
+      return;
+    }
+
+    this.setData({
+      departmentBattles: result.battles,
+      departmentBattleGenerated: true
     });
   },
 
@@ -195,27 +287,13 @@ Page({
     }
 
     if (!app.isLoggedIn()) {
-      wx.showModal({
-        title: '请先登录',
-        content: '您还未登录，是否现在去登录？',
-        confirmText: '去登录',
-        success: modalRes => {
-          if (modalRes.confirm) {
-            wx.navigateTo({
-              url: '/pages/login/login'
-            });
-          }
-        }
-      });
+      this.goToNewRegistration();
       return;
     }
 
     app.getUserOpenId(openid => {
       if (!openid) {
-        wx.showToast({
-          title: '网络错误，请重试',
-          icon: 'none'
-        });
+        this.goToNewRegistration();
         return;
       }
 

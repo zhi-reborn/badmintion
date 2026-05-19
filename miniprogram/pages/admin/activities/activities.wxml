@@ -108,6 +108,11 @@
           <view class="form-label">活动描述</view>
           <textarea class="form-textarea" placeholder="请输入活动描述" value="{{formData.description}}" data-field="description" bindinput="onInputChange" />
         </view>
+
+        <view class="form-item">
+          <view class="form-label">分组名称</view>
+          <input class="form-input" placeholder="多个组名用逗号分隔，如：A组,B组,C组" value="{{formData.groups}}" data-field="groups" bindinput="onInputChange" />
+        </view>
       </scroll-view>
 
       <view class="modal-footer">

@@ -81,9 +81,52 @@
     </view>
 
     <view class="section" wx:if="{{participants.length > 0}}">
+      <view class="section-title">分组抽签</view>
+      <view class="draw-actions">
+        <button class="draw-btn" bindtap="runGroupDraw">分组抽签</button>
+        <button class="draw-btn" bindtap="runGroupBattle">小组对战</button>
+      </view>
+
+      <view wx:if="{{groupDraws.length > 0}}" class="draw-result">
+        <view class="result-title">分组抽签结果</view>
+        <view wx:for="{{groupDraws}}" wx:key="name" class="group-result">
+          <view class="group-header">
+            <text class="group-name">{{item.name}}</text>
+            <text class="group-count">{{item.participants.length}}人</text>
+          </view>
+          <view class="group-participants">
+            <view wx:for="{{item.participants}}" wx:for-item="participant" wx:key="_id" class="group-participant">
+              <text class="participant-name">{{participant.name}}</text>
+              <text class="participant-dept">{{participant.department}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{groupBattles.length > 0}}" class="draw-result">
+        <view class="result-title">小组对战表</view>
+        <view wx:for="{{groupBattles}}" wx:key="round" class="battle-match">
+          <view class="battle-side">
+            <text class="battle-name">{{item.groupA.name}}</text>
+            <text class="battle-count">{{item.groupA.participantCount}}人</text>
+          </view>
+          <view class="battle-vs">{{item.status === 'bye' ? '轮空' : 'VS'}}</view>
+          <view wx:if="{{item.groupB}}" class="battle-side">
+            <text class="battle-name">{{item.groupB.name}}</text>
+            <text class="battle-count">{{item.groupB.participantCount}}人</text>
+          </view>
+          <view wx:else class="battle-side muted">
+            <text class="battle-name">等待下一轮</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{participants.length > 0}}">
       <view class="section-title">部门抽签</view>
       <view class="draw-actions">
         <button class="draw-btn" bindtap="runDepartmentDraw">部门抽签</button>
+        <button class="draw-btn" bindtap="runDepartmentBattle">部门对战</button>
       </view>
 
       <view wx:if="{{departmentDraws.length > 0}}" class="draw-result">
@@ -104,6 +147,23 @@
         </view>
       </view>
 
+      <view wx:if="{{departmentBattles.length > 0}}" class="draw-result">
+        <view class="result-title">部门对战表</view>
+        <view wx:for="{{departmentBattles}}" wx:key="round" class="battle-match">
+          <view class="battle-side">
+            <text class="battle-name">{{item.departmentA.name}}</text>
+            <text class="battle-count">{{item.departmentA.participantCount}}人</text>
+          </view>
+          <view class="battle-vs">{{item.status === 'bye' ? '轮空' : 'VS'}}</view>
+          <view wx:if="{{item.departmentB}}" class="battle-side">
+            <text class="battle-name">{{item.departmentB.name}}</text>
+            <text class="battle-count">{{item.departmentB.participantCount}}人</text>
+          </view>
+          <view wx:else class="battle-side muted">
+            <text class="battle-name">等待下一轮</text>
+          </view>
+        </view>
+      </view>
     </view>
 
     <view class="section">
