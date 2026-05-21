@@ -216,10 +216,65 @@ Page({
   },
 
   runGroupBattle: function () {
-    if (this.data.groupDraws.length === 0) {
+    const groupsText = this.data.activity.groups || '';
+    const groupNames = groupsText
+      .replace(/，/g, ',')
+      .replace(/\s+/g, ',')
+      .replace(/；/g, ',')
+      .replace(/;/g, ',')
+      .split(',')
+      .map(name => name.trim())
+      .filter(name => name.length > 0);
+
+    if (groupNames.length === 0) {
       wx.showToast({
-        title: '请先进行分组抽签',
+        title: '请先设置分组名称',
         icon: 'none'
+      });
+      return;
+    }
+
+    if (this.data.participants.length === 0) {
+      wx.showToast({
+        title: '暂无报名人员',
+        icon: 'none'
+      });
+      return;
+    }
+
+    const currentGroupNames = this.data.groupDraws.map(g => g.name);
+    const needsRedraw = groupNames.length !== currentGroupNames.length ||
+      !groupNames.every(name => currentGroupNames.includes(name));
+
+    if (this.data.groupDraws.length === 0 || needsRedraw) {
+      const drawResult = drawGroupMatches(this.data.participants, groupsText);
+      
+      if (drawResult.error) {
+        wx.showToast({
+          title: drawResult.error,
+          icon: 'none'
+        });
+        return;
+      }
+
+      this.setData({
+        groupDraws: drawResult.groups,
+        groupDrawGenerated: true
+      });
+
+      const battleResult = generateGroupBattles(drawResult.groups);
+
+      if (battleResult.error) {
+        wx.showToast({
+          title: battleResult.error,
+          icon: 'none'
+        });
+        return;
+      }
+
+      this.setData({
+        groupBattles: battleResult.battles,
+        groupBattleGenerated: true
       });
       return;
     }

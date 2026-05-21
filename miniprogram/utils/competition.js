@@ -96,6 +96,10 @@ function parseGroups(groupsText) {
   }
 
   return groupsText
+    .replace(/，/g, ',')
+    .replace(/\s+/g, ',')
+    .replace(/；/g, ',')
+    .replace(/;/g, ',')
     .split(',')
     .map(name => name.trim())
     .filter(name => name.length > 0);

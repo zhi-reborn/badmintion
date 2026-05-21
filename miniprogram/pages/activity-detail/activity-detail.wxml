@@ -136,7 +136,7 @@
             <text class="department-name">{{item.departmentA.name}}</text>
             <text class="department-count">{{item.departmentA.participantCount}}人</text>
           </view>
-          <view class="match-vs">{{item.status === 'bye' ? '轮空' : 'VS'}}</view>
+          <view class="match-vs">{{item.status === 'bye' ? '轮空' : '和'}}</view>
           <view wx:if="{{item.departmentB}}" class="department-side">
             <text class="department-name">{{item.departmentB.name}}</text>
             <text class="department-count">{{item.departmentB.participantCount}}人</text>

@@ -24,11 +24,8 @@ Page({
     skillOptions: ['初级', '中级', '高级', '专业'],
     skillIndex: 1,
     matchItems: [
-      { id: 'male_single', name: '男单', checked: false },
-      { id: 'female_single', name: '女单', checked: false },
-      { id: 'male_double', name: '男双', checked: false },
-      { id: 'female_double', name: '女双', checked: false },
-      { id: 'mixed_double', name: '混双', checked: false }
+      { id: 'team', name: '团体赛', checked: false },
+      { id: 'fun', name: '趣味赛', checked: false }
     ],
     selectedItems: [],
     activities: [],
