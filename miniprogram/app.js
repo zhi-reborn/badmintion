@@ -11,9 +11,7 @@ App({
 
     this.globalData = {
       loginInfo: null,
-      userInfo: null,
-      openid: null,
-      isAdmin: false
+      openid: null
     };
 
     this.checkLogin();
@@ -21,14 +19,9 @@ App({
 
   checkLogin: function() {
     const loginInfo = wx.getStorageSync('loginInfo');
-    const userInfo = wx.getStorageSync('userInfo');
-    
+
     if (loginInfo) {
       this.globalData.loginInfo = loginInfo;
-    }
-    if (userInfo) {
-      this.globalData.userInfo = userInfo;
-      this.globalData.isAdmin = userInfo.isAdmin || false;
     }
   },
 
@@ -57,8 +50,6 @@ App({
 
   clearLoginInfo: function() {
     this.globalData.loginInfo = null;
-    this.globalData.userInfo = null;
-    this.globalData.isAdmin = false;
     wx.removeStorageSync('loginInfo');
   },
 
@@ -72,7 +63,6 @@ App({
       name: 'login',
       data: {},
       success: res => {
-        console.log('获取openid成功', res.result.openid);
         this.globalData.openid = res.result.openid;
         callback(res.result.openid);
       },

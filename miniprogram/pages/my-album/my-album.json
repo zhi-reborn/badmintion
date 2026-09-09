@@ -1,4 +1,5 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "运动相册"
+  "navigationBarTitleText": "运动相册",
+  "enablePullDownRefresh": true
 }

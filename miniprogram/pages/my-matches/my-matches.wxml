@@ -1,15 +1,15 @@
 <view class="container">
   <view class="tabs">
-    <view 
-      class="tab {{currentTab === 0 ? 'active' : ''}}" 
-      data-index="0" 
+    <view
+      class="tab {{currentTab === 0 ? 'active' : ''}}"
+      data-index="0"
       bindtap="onTabChange"
     >
       比赛项目
     </view>
-    <view 
-      class="tab {{currentTab === 1 ? 'active' : ''}}" 
-      data-index="1" 
+    <view
+      class="tab {{currentTab === 1 ? 'active' : ''}}"
+      data-index="1"
       bindtap="onTabChange"
     >
       比赛记录
@@ -28,22 +28,13 @@
     <view wx:else class="match-list">
       <view wx:for="{{matchItems}}" wx:key="_id" class="match-card" data-id="{{item._id}}" bindtap="goToMatchDetail">
         <view class="match-header">
-          <view class="match-type">{{item.type || '比赛'}}</view>
+          <view class="match-type">比赛项目</view>
           <view class="match-status {{item.status === '报名中' ? 'status-open' : item.status === '进行中' ? 'status-ongoing' : 'status-ended'}}">
             {{item.status || '已结束'}}
           </view>
         </view>
         <view class="match-title">{{item.name}}</view>
-        <view class="match-info">
-          <view class="info-item">
-            <text class="info-icon">📅</text>
-            <text>{{item.matchDate || '待定'}}</text>
-          </view>
-          <view class="info-item">
-            <text class="info-icon">📍</text>
-            <text>{{item.venue || '待定'}}</text>
-          </view>
-        </view>
+        <view class="match-desc" wx:if="{{item.description}}">{{item.description}}</view>
       </view>
     </view>
   </view>
@@ -56,22 +47,22 @@
     <view wx:else class="match-list">
       <view wx:for="{{matches}}" wx:key="_id" class="match-record-card">
         <view class="match-record-header">
-          <text class="match-record-title">{{item.matchName || '比赛'}}</text>
-          <text class="match-record-time">{{item.matchTime}}</text>
+          <text class="match-record-title">{{item.itemName || '比赛'}}</text>
+          <text class="match-record-time">{{item.timeDisplay}}</text>
         </view>
         <view class="match-record-body">
           <view class="player-info left">
-            <view class="player-name">{{item.player1Name}}</view>
+            <view class="player-name">{{item.team1Display}}</view>
             <view class="player-score {{item.score1 > item.score2 ? 'winner' : ''}}">{{item.score1}}</view>
           </view>
           <view class="vs">VS</view>
           <view class="player-info right">
             <view class="player-score {{item.score2 > item.score1 ? 'winner' : ''}}">{{item.score2}}</view>
-            <view class="player-name">{{item.player2Name}}</view>
+            <view class="player-name">{{item.team2Display}}</view>
           </view>
         </view>
-        <view class="match-result {{item.winner === item.player1Name ? 'win' : 'lose'}}">
-          {{item.winner === userInfo.name ? '胜利' : '失败'}}
+        <view wx:if="{{item.isWin || item.isLose}}" class="match-result {{item.isWin ? 'win' : 'lose'}}">
+          {{item.isWin ? '胜利' : '失败'}}
         </view>
       </view>
     </view>

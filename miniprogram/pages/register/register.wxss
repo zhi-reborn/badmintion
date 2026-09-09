@@ -44,6 +44,32 @@
   box-sizing: border-box;
 }
 
+.gender-segment {
+  display: flex;
+  gap: 20rpx;
+}
+
+.gender-option {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  background-color: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #666666;
+  border: 2rpx solid transparent;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.gender-option.active {
+  background-color: #e6f7f7;
+  color: #0ABAB5;
+  border-color: #0ABAB5;
+  font-weight: 500;
+}
+
 .form-picker {
   display: flex;
   justify-content: space-between;

@@ -9,12 +9,12 @@
     </view>
     <view class="search-bar">
       <text class="search-icon">🔍</text>
-      <input class="search-input" placeholder="搜索场地" />
+      <input class="search-input" placeholder="搜索场地名称或地址" value="{{keyword}}" bindinput="onSearchInput" confirm-type="search" />
     </view>
     <view class="type-tabs">
-      <view 
-        wx:for="{{types}}" 
-        wx:key="index" 
+      <view
+        wx:for="{{types}}"
+        wx:key="*this"
         class="type-tab {{currentType === item ? 'active' : ''}}"
         data-type="{{item}}"
         bindtap="onTypeChange"
@@ -28,6 +28,11 @@
     <text>加载中...</text>
   </view>
 
+  <view wx:elif="{{venues.length === 0 && allVenues.length > 0}}" class="empty-state">
+    <view class="empty-icon">🔍</view>
+    <text>没有符合条件的场地</text>
+  </view>
+
   <view wx:elif="{{venues.length === 0}}" class="empty-state">
     <view class="empty-icon">🏟️</view>
     <text>暂无场地信息</text>
@@ -36,7 +41,10 @@
   <view wx:else class="venue-list">
     <view wx:for="{{venues}}" wx:key="_id" class="venue-card" data-id="{{item._id}}" bindtap="goToVenueDetail">
       <view class="venue-image">
-        <image src="{{item.image || '/images/default-venue.png'}}" mode="aspectFill" />
+        <image wx:if="{{item.image}}" src="{{item.image}}" mode="aspectFill" class="venue-img" />
+        <view wx:else class="venue-image-placeholder">
+          <text class="venue-image-icon">🏟️</text>
+        </view>
         <view class="venue-type-tag">{{item.type}}</view>
       </view>
       <view class="venue-info">

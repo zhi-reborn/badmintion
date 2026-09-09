@@ -8,23 +8,28 @@
     </view>
 
     <view class="form-item">
+      <view class="form-label">性别 <text class="required">*</text></view>
+      <view class="gender-segment">
+        <view
+          wx:for="{{genderOptions}}"
+          wx:key="*this"
+          class="gender-option {{formData.gender === item ? 'active' : ''}}"
+          data-gender="{{item}}"
+          bindtap="onGenderTap"
+        >
+          {{item}}
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
       <view class="form-label">联系电话</view>
       <input class="form-input" type="number" placeholder="请输入手机号（选填）" data-field="phone" value="{{formData.phone}}" bindinput="onInputChange" />
     </view>
 
     <view class="form-item">
-      <view class="form-label">部门 <text class="required">*</text></view>
-      <input class="form-input" placeholder="请输入部门" data-field="department" value="{{formData.department}}" bindinput="onInputChange" />
-    </view>
-
-    <view class="form-item">
-      <view class="form-label">性别 <text class="required">*</text></view>
-      <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
-        <view class="form-picker">
-          <text>{{genderOptions[genderIndex]}}</text>
-          <text class="picker-arrow">▼</text>
-        </view>
-      </picker>
+      <view class="form-label">团体名称</view>
+      <input class="form-input" placeholder="请输入团体名称（选填）" data-field="department" value="{{formData.department}}" bindinput="onInputChange" />
     </view>
 
     <view class="form-item">
@@ -80,7 +85,7 @@
           <view class="reg-name">{{item.name}}</view>
         </view>
         <view class="reg-info">
-          <text>部门: {{item.department}}</text>
+          <text>团体名称: {{item.department}}</text>
           <text>活动: {{item.activityNames || '未选择'}}</text>
         </view>
         <view class="reg-items" wx:if="{{item.items.length > 0}}">

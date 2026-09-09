@@ -1,6 +1,6 @@
 function normalizeDepartment(value) {
   const text = String(value || '').trim();
-  return text || '未填写部门';
+  return text || '未填写团体名称';
 }
 
 function toNumber(value) {

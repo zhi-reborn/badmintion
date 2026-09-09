@@ -1,5 +1,5 @@
-const app = getApp();
 const db = wx.cloud.database();
+const { fetchAll } = require('../../utils/db');
 
 Page({
   data: {
@@ -24,29 +24,25 @@ Page({
   },
 
   loadMatchItems: function () {
-    db.collection('match_items')
-      .orderBy('createTime', 'desc')
-      .get()
-      .then(res => {
+    fetchAll(db, 'match_items', { orderBy: 'createTime' })
+      .then(list => {
         this.setData({
-          matchItems: res.data,
+          matchItems: list,
           loading: false
         });
+        wx.stopPullDownRefresh();
       })
       .catch(err => {
         console.error('加载比赛项目失败', err);
         this.setData({ loading: false });
+        wx.stopPullDownRefresh();
       });
   },
 
   loadMatches: function () {
-    db.collection('matches')
-      .orderBy('matchTime', 'desc')
-      .get()
-      .then(res => {
-        this.setData({
-          matches: res.data
-        });
+    fetchAll(db, 'matches', { orderBy: 'matchTime' })
+      .then(list => {
+        this.setData({ matches: list });
       })
       .catch(err => {
         console.error('加载比赛结果失败', err);
@@ -72,6 +68,5 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadData();
-    wx.stopPullDownRefresh();
   }
 });

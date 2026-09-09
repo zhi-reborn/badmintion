@@ -1,11 +1,10 @@
 const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const { attachRealRegistrationCounts } = require('../../utils/db');
 
 Page({
   data: {
-    userInfo: null,
-    hasUserInfo: false,
     isAdmin: false,
     banners: [
       { id: 1, image: '', title: '欢迎参加羽毛球比赛' }
@@ -37,16 +36,17 @@ Page({
   },
 
   checkUserInfo: function () {
-    const userInfo = wx.getStorageSync('userInfo');
-    if (userInfo) {
-      this.setData({
-        userInfo: userInfo,
-        hasUserInfo: true,
-        isAdmin: userInfo.isAdmin || false
+    app.getUserOpenId(openid => {
+      if (!openid) return;
+      db.collection('admins').where({
+        _openid: openid
+      }).get().then(res => {
+        this.setData({ isAdmin: res.data.length > 0 });
+      }).catch(err => {
+        console.error('检查管理员状态失败', err);
+        this.setData({ isAdmin: false });
       });
-      app.globalData.userInfo = userInfo;
-      app.globalData.isAdmin = userInfo.isAdmin || false;
-    }
+    });
   },
 
   loadMatchStats: function () {
@@ -73,12 +73,14 @@ Page({
       .orderBy('createTime', 'desc')
       .limit(3)
       .get()
-      .then(res => {
-        console.log('加载热门活动成功', res.data.length);
-        this.setData({ hotActivities: res.data });
+      .then(res => attachRealRegistrationCounts(db, res.data))
+      .then(list => {
+        this.setData({ hotActivities: list });
+        wx.stopPullDownRefresh();
       })
       .catch(err => {
         console.error('加载热门活动失败', err);
+        wx.stopPullDownRefresh();
       });
   },
 

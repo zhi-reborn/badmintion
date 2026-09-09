@@ -1,8 +1,8 @@
 <view class="container">
   <view class="header">
     <view class="header-content">
-      <view class="header-title">🏸 羽毛球活动</view>
-      <view class="header-subtitle">公司羽毛球协会</view>
+      <view class="header-title">🏸 羽你相约</view>
+      <view class="header-subtitle">2026年“工会杯”羽毛球赛</view>
     </view>
   </view>
 
@@ -63,8 +63,9 @@
     </view>
     <view class="notice-item">
       <view class="notice-title">欢迎参加公司羽毛球活动</view>
-      <view class="notice-content">请各位同事积极报名参加，锻炼身体！报名后可在每个活动中查看所有报名选手信息。</view>
-      <view class="notice-time">2026-03-15</view>
+      <view class="notice-content">请各位同事积极报名参加，锻炼身体！
+      报名后可在每个活动中查看所有报名选手信息。</view>
+      <view class="notice-time">2026-09-08</view>
     </view>
   </view>
 

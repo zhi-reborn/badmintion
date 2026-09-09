@@ -31,7 +31,7 @@ function buildRegistrationStats(participants = []) {
 
   return {
     total,
-    departmentStats: toStats(countBy(validParticipants, 'department', '未填写部门'), total),
+    departmentStats: toStats(countBy(validParticipants, 'department', '未填写团体名称'), total),
     genderStats: toStats(countBy(validParticipants, 'gender', '未填写性别'), total)
   };
 }
@@ -51,7 +51,7 @@ function shuffle(items, random = Math.random) {
 
 function getDepartmentEntries(participants) {
   const departments = participants.reduce((result, participant) => {
-    const name = normalizeValue(participant.department, '未填写部门');
+    const name = normalizeValue(participant.department, '未填写团体名称');
     if (!result[name]) {
       result[name] = {
         name,
@@ -163,7 +163,7 @@ function generateDepartmentBattles(participants = [], options = {}) {
   const departments = getDepartmentEntries(validParticipants);
 
   if (departments.length < 2) {
-    return { battles: [], error: '至少需要2个部门才能生成对战' };
+    return { battles: [], error: '至少需要2个团体才能生成对战' };
   }
 
   const shuffledDepartments = shuffle(departments, options.random);

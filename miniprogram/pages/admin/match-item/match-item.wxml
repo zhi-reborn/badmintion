@@ -97,7 +97,7 @@
   </block>
 
   <view wx:if="{{showAddSchedule}}" class="modal-mask" bindtap="closeScheduleModal">
-    <view class="modal-content" catchtap="">
+    <view class="modal-content" catchtap="stopPropagation">
       <view class="modal-header">
         <text class="modal-title">添加赛程</text>
         <text class="modal-close" bindtap="closeScheduleModal">×</text>
@@ -147,7 +147,7 @@
   </view>
 
   <view wx:if="{{showAddResult}}" class="modal-mask" bindtap="closeResultModal">
-    <view class="modal-content" catchtap="">
+    <view class="modal-content" catchtap="stopPropagation">
       <view class="modal-header">
         <text class="modal-title">录入比赛结果</text>
         <text class="modal-close" bindtap="closeResultModal">×</text>

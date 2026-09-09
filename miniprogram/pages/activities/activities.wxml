@@ -10,7 +10,7 @@
     <view class="type-tabs">
       <view 
         wx:for="{{types}}" 
-        wx:key="index" 
+        wx:key="*this"
         class="type-tab {{currentType === item ? 'active' : ''}}"
         data-type="{{item}}"
         bindtap="onTypeChange"

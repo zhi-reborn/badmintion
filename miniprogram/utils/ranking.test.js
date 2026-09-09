@@ -40,8 +40,8 @@ function testBuildDepartmentRankings() {
       players: ['Cindy']
     },
     {
-      _id: 'department-未填写部门',
-      departmentName: '未填写部门',
+      _id: 'department-未填写团体名称',
+      departmentName: '未填写团体名称',
       playerCount: 1,
       total: 1,
       win: 1,

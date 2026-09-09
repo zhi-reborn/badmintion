@@ -1,2 +1,59 @@
-<!--pages/venue-detail/venue-detail.wxml-->
-<text>pages/venue-detail/venue-detail.wxml</text>
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{!venue}}" class="empty-state">
+    <view class="empty-icon">🏟️</view>
+    <text>场地不存在或已下架</text>
+  </view>
+
+  <view wx:else class="detail-content">
+    <view class="venue-banner">
+      <image wx:if="{{venue.image}}" src="{{venue.image}}" mode="aspectFill" class="banner-image" />
+      <view wx:else class="banner-placeholder">
+        <text class="banner-icon">🏟️</text>
+      </view>
+      <view class="venue-type-tag">{{venue.type}}</view>
+    </view>
+
+    <view class="venue-info-card">
+      <view class="venue-name">{{venue.name}}</view>
+      <view class="venue-rating">
+        <text class="rating-icon">⭐</text>
+        <text>{{venue.rating || '5.0'}}</text>
+      </view>
+
+      <view class="info-row" bindtap="copyAddress">
+        <text class="info-icon">📍</text>
+        <text class="info-text">{{venue.address || '暂无地址'}}</text>
+        <text class="info-action" wx:if="{{venue.address}}">复制</text>
+      </view>
+
+      <view class="info-row">
+        <text class="info-icon">💰</text>
+        <view class="info-text price-text">
+          <text class="price-value">¥{{venue.price}}</text>
+          <text class="price-unit">/小时</text>
+        </view>
+      </view>
+
+      <view class="venue-tags" wx:if="{{venue.facilities && venue.facilities.length > 0}}">
+        <text wx:for="{{venue.facilities}}" wx:for-item="facility" wx:key="*this" class="facility-tag">{{facility}}</text>
+      </view>
+    </view>
+
+    <view class="venue-desc-card" wx:if="{{venue.description}}">
+      <view class="section-title">场地介绍</view>
+      <view class="desc-text">{{venue.description}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{venue}}" class="bottom-bar">
+    <view class="bottom-price">
+      <text class="price-value">¥{{venue.price}}</text>
+      <text class="price-unit">/小时</text>
+    </view>
+    <view class="book-btn" bindtap="bookVenue">咨询预订</view>
+  </view>
+</view>

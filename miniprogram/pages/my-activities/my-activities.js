@@ -119,6 +119,5 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadMyActivities();
-    wx.stopPullDownRefresh();
   }
 });

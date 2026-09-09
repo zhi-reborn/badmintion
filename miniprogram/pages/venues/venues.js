@@ -1,12 +1,14 @@
-const app = getApp();
 const db = wx.cloud.database();
+const { fetchAll } = require('../../utils/db');
 
 Page({
   data: {
     venues: [],
+    allVenues: [],
     loading: true,
-    currentType: 'all',
-    types: ['全部', '室内', '室外']
+    currentType: '全部',
+    types: ['全部', '室内', '室外'],
+    keyword: ''
   },
 
   onLoad: function () {
@@ -18,27 +20,45 @@ Page({
   },
 
   loadVenues: function () {
-    db.collection('venues')
-      .where({
-        status: 'active'
-      })
-      .orderBy('createTime', 'desc')
-      .get()
-      .then(res => {
-        this.setData({
-          venues: res.data,
-          loading: false
-        });
-      })
-      .catch(err => {
-        console.error('加载场地失败', err);
-        this.setData({ loading: false });
+    fetchAll(db, 'venues', {
+      where: { status: 'active' },
+      orderBy: 'createTime'
+    }).then(list => {
+      this.setData({
+        allVenues: list,
+        loading: false
       });
+      this.applyFilter();
+      wx.stopPullDownRefresh();
+    }).catch(err => {
+      console.error('加载场地失败', err);
+      this.setData({ loading: false });
+      wx.stopPullDownRefresh();
+    });
+  },
+
+  applyFilter: function () {
+    const { allVenues, currentType, keyword } = this.data;
+    const kw = String(keyword || '').trim();
+    const venues = allVenues.filter(v => {
+      const typeOk = currentType === '全部' || v.type === currentType;
+      const kwOk = !kw ||
+        String(v.name || '').indexOf(kw) >= 0 ||
+        String(v.address || '').indexOf(kw) >= 0;
+      return typeOk && kwOk;
+    });
+    this.setData({ venues });
   },
 
   onTypeChange: function (e) {
     const type = e.currentTarget.dataset.type;
     this.setData({ currentType: type });
+    this.applyFilter();
+  },
+
+  onSearchInput: function (e) {
+    this.setData({ keyword: e.detail.value });
+    this.applyFilter();
   },
 
   goToVenueDetail: function (e) {
@@ -56,6 +76,5 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadVenues();
-    wx.stopPullDownRefresh();
   }
 });

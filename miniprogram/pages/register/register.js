@@ -1,6 +1,6 @@
 const app = getApp();
 const db = wx.cloud.database();
-const _ = db.command;
+const { fetchAll, attachRealRegistrationCounts } = require('../../utils/db');
 const {
   filterRegistrationsForLogin,
   getRegistrationForActivity,
@@ -20,7 +20,6 @@ Page({
       activityNames: []
     },
     genderOptions: ['男', '女'],
-    genderIndex: 0,
     skillOptions: ['初级', '中级', '高级', '专业'],
     skillIndex: 1,
     matchItems: [
@@ -48,9 +47,6 @@ Page({
         'formData.activityNames': activityName ? [activityName] : []
       });
     }
-
-    this.loadActivities();
-    this.loadMyRegistrations();
   },
 
   onShow: function () {
@@ -60,20 +56,20 @@ Page({
 
   loadActivities: function () {
     const that = this;
-    db.collection('activities')
-      .get()
-      .then(res => {
-        console.log('所有活动:', res.data);
-        const activities = res.data.filter(item => 
+    fetchAll(db, 'activities', { orderBy: 'createTime' })
+      .then(list => {
+        const activeList = list.filter(item =>
           item.status === '报名中' || item.status === '进行中'
         );
+        return attachRealRegistrationCounts(db, activeList);
+      })
+      .then(activities => {
         const selectedIds = that.data.formData.activityIds || [];
         const selectedActivities = buildActivitySelection(activities, selectedIds);
         const selectedActivityNames = selectedActivities
           .filter(item => item.checked)
           .map(item => item.title);
 
-        console.log('可报名活动:', selectedActivities.length, selectedActivities);
         that.setData({
           activities: selectedActivities,
           'formData.activityNames': selectedActivityNames.length > 0
@@ -98,12 +94,10 @@ Page({
 
     app.getUserOpenId(openid => {
       if (!openid) return;
-      
-      db.collection('registrations').where({
-        _openid: openid
-      }).orderBy('createTime', 'desc').get().then(res => {
+
+      fetchAll(db, 'registrations', { where: { _openid: openid }, orderBy: 'createTime' }).then(list => {
         this.setData({
-          myRegistrations: filterRegistrationsForLogin(res.data, app.getLoginInfo())
+          myRegistrations: filterRegistrationsForLogin(list, app.getLoginInfo())
         });
       }).catch(err => {
         console.error('加载我的报名记录失败', err);
@@ -118,11 +112,9 @@ Page({
     });
   },
 
-  onGenderChange: function (e) {
-    const index = e.detail.value;
+  onGenderTap: function (e) {
     this.setData({
-      genderIndex: index,
-      'formData.gender': this.data.genderOptions[index]
+      'formData.gender': e.currentTarget.dataset.gender
     });
   },
 
@@ -153,20 +145,15 @@ Page({
   },
 
   onActivityChange: function (e) {
-    console.log('活动选择变化:', e.detail.value);
     const selectedIds = e.detail.value || [];
     const activities = this.data.activities;
-    const selectedActivities = selectedIds;
     const selectedActivityNames = activities
       .filter(a => selectedIds.indexOf(a._id) >= 0)
       .map(a => a.title);
     const nextActivities = buildActivitySelection(activities, selectedIds);
-    
-    console.log('选中的活动ID:', selectedIds);
-    console.log('选中的活动名称:', selectedActivityNames);
-    
+
     this.setData({
-      selectedActivities: selectedActivities,
+      selectedActivities: selectedIds,
       activities: nextActivities,
       'formData.activityIds': selectedIds,
       'formData.activityNames': selectedActivityNames
@@ -185,7 +172,6 @@ Page({
         activityIds: [],
         activityNames: []
       },
-      genderIndex: 0,
       skillIndex: 1,
       matchItems: this.data.matchItems.map(item => ({ ...item, checked: false })),
       selectedItems: [],
@@ -199,7 +185,7 @@ Page({
   },
 
   validateForm: function () {
-    const { name, phone, department, gender, activityIds } = this.data.formData;
+    const { name, phone, gender, activityIds } = this.data.formData;
     
     if (!name || !name.trim()) {
       wx.showToast({ title: '请输入姓名', icon: 'none' });
@@ -207,10 +193,6 @@ Page({
     }
     if (phone && phone.trim() && !/^1[3-9]\d{9}$/.test(phone)) {
       wx.showToast({ title: '请输入正确的手机号', icon: 'none' });
-      return false;
-    }
-    if (!department || !department.trim()) {
-      wx.showToast({ title: '请输入部门', icon: 'none' });
       return false;
     }
     if (!gender) {
@@ -263,9 +245,7 @@ Page({
         title: '报名成功',
         icon: 'success'
       });
-      
-      this.updateActivityCount(this.data.formData.activityIds);
-      
+
       setTimeout(() => {
         wx.switchTab({
           url: '/pages/index/index'
@@ -278,21 +258,6 @@ Page({
         icon: 'none'
       });
       console.error('报名失败', err);
-    });
-  },
-
-  updateActivityCount: function (activityIds) {
-    if (!activityIds || activityIds.length === 0) return;
-    
-    activityIds.forEach(activityId => {
-      db.collection('activities').doc(activityId).get().then(res => {
-        if (res.data) {
-          const currentCount = (res.data.currentCount || 0) + 1;
-          db.collection('activities').doc(activityId).update({
-            data: { currentCount: currentCount }
-          });
-        }
-      });
     });
   },
 
@@ -319,26 +284,12 @@ Page({
       content: '确定要取消这条报名记录吗？',
       success: res => {
         if (res.confirm) {
-          const registration = this.data.myRegistrations.find(r => r._id === id);
-          
           db.collection('registrations').doc(id).remove().then(() => {
             wx.showToast({
               title: '已取消报名',
               icon: 'success'
             });
-            
-            if (registration && registration.activityIds) {
-              registration.activityIds.forEach(activityId => {
-                db.collection('activities').doc(activityId).get().then(res => {
-                  if (res.data && res.data.currentCount > 0) {
-                    db.collection('activities').doc(activityId).update({
-                      data: { currentCount: res.data.currentCount - 1 }
-                    });
-                  }
-                });
-              });
-            }
-            
+
             this.loadMyRegistrations();
           }).catch(err => {
             wx.showToast({

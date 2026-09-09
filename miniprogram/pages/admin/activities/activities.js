@@ -1,5 +1,5 @@
-const app = getApp();
 const db = wx.cloud.database();
+const { fetchAll, attachRealRegistrationCounts } = require('../../../utils/db');
 
 Page({
   data: {
@@ -36,19 +36,19 @@ Page({
   loadActivities: function () {
     this.setData({ loading: true });
     
-    db.collection('activities')
-      .orderBy('createTime', 'desc')
-      .get()
-      .then(res => {
-        console.log('加载活动成功', res.data.length);
+    fetchAll(db, 'activities', { orderBy: 'createTime' })
+      .then(list => attachRealRegistrationCounts(db, list))
+      .then(list => {
         this.setData({
-          activities: res.data,
+          activities: list,
           loading: false
         });
+        wx.stopPullDownRefresh();
       })
       .catch(err => {
         console.error('加载活动失败', err);
         this.setData({ loading: false });
+        wx.stopPullDownRefresh();
         wx.showModal({
           title: '提示',
           content: 'activities 集合不存在，请先在云开发控制台创建该集合',
@@ -95,7 +95,8 @@ Page({
           time: activity.time || '',
           maxCount: activity.maxCount || 20,
           fee: activity.fee || 0,
-          description: activity.description || ''
+          description: activity.description || '',
+          groups: activity.groups || ''
         },
         typeIndex: this.data.typeOptions.indexOf(activity.type),
         statusIndex: this.data.statusOptions.indexOf(activity.status)
@@ -195,7 +196,6 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadActivities();
-    wx.stopPullDownRefresh();
   },
 
   stopPropagation: function () {

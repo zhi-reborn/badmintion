@@ -42,6 +42,12 @@
   padding: 20rpx;
 }
 
+.match-desc {
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
 .match-card {
   background-color: #ffffff;
   border-radius: 16rpx;

@@ -55,7 +55,7 @@
         <view class="player-info">
           <view class="player-avatar department-avatar">{{item.departmentName ? item.departmentName[0] : '?'}}</view>
           <view class="player-detail">
-            <view class="player-name">{{item.departmentName || '未知部门'}}</view>
+            <view class="player-name">{{item.departmentName || '未知团体'}}</view>
             <view class="player-stats">
               <text>{{item.total || 0}}积分</text>
               <text>·</text>

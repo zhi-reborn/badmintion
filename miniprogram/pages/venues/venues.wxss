@@ -106,9 +106,22 @@
   height: 300rpx;
 }
 
-.venue-image image {
+.venue-image image,
+.venue-img,
+.venue-image-placeholder {
   width: 100%;
   height: 100%;
+}
+
+.venue-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0ABAB5, #0891a3);
+}
+
+.venue-image-icon {
+  font-size: 80rpx;
 }
 
 .venue-type-tag {

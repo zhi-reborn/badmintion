@@ -1,5 +1,5 @@
-const app = getApp();
 const db = wx.cloud.database();
+const { fetchAll } = require('../../../utils/db');
 
 Page({
   data: {
@@ -34,15 +34,13 @@ Page({
   loadVenues: function () {
     this.setData({ loading: true });
     
-    db.collection('venues')
-      .orderBy('createTime', 'desc')
-      .get()
-      .then(res => {
-        console.log('加载场地成功', res.data.length);
+    fetchAll(db, 'venues', { orderBy: 'createTime' })
+      .then(list => {
         this.setData({
-          venues: res.data,
+          venues: list,
           loading: false
         });
+        wx.stopPullDownRefresh();
       })
       .catch(err => {
         console.error('加载场地失败', err);
@@ -127,7 +125,7 @@ Page({
 
   saveVenue: function () {
     const { formData, editMode, editId } = this.data;
-    
+
     if (!formData.name.trim()) {
       wx.showToast({ title: '请输入场地名称', icon: 'none' });
       return;
@@ -135,10 +133,16 @@ Page({
 
     wx.showLoading({ title: '保存中...' });
 
+    const saveData = {
+      ...formData,
+      price: Number(formData.price) || 0,
+      rating: Number(formData.rating) || 5.0
+    };
+
     if (editMode) {
       db.collection('venues').doc(editId).update({
         data: {
-          ...formData,
+          ...saveData,
           updateTime: db.serverDate()
         }
       }).then(() => {
@@ -153,7 +157,7 @@ Page({
     } else {
       db.collection('venues').add({
         data: {
-          ...formData,
+          ...saveData,
           status: 'active',
           createTime: db.serverDate()
         }
@@ -190,7 +194,6 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadVenues();
-    wx.stopPullDownRefresh();
   },
 
   stopPropagation: function () {

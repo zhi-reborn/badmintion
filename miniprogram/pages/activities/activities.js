@@ -1,6 +1,6 @@
-const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const { fetchAll, attachRealRegistrationCounts } = require('../../utils/db');
 
 Page({
   data: {
@@ -29,20 +29,22 @@ Page({
       condition.type = this.data.currentType;
     }
     
-    db.collection('activities')
-      .where(condition)
-      .orderBy('createTime', 'desc')
-      .get()
-      .then(res => {
-        console.log('加载活动成功', res.data.length);
+    fetchAll(db, 'activities', {
+      where: condition,
+      orderBy: 'createTime'
+    })
+      .then(list => attachRealRegistrationCounts(db, list))
+      .then(list => {
         this.setData({
-          activities: res.data,
+          activities: list,
           loading: false
         });
+        wx.stopPullDownRefresh();
       })
       .catch(err => {
         console.error('加载活动失败', err);
         this.setData({ loading: false });
+        wx.stopPullDownRefresh();
         wx.showToast({
           title: '加载失败',
           icon: 'none'

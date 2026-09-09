@@ -53,7 +53,7 @@
     <view class="section" wx:if="{{participants.length > 0}}">
       <view class="section-title">报名统计</view>
       <view class="stats-block">
-        <view class="stats-subtitle">部门维度</view>
+        <view class="stats-subtitle">团体维度</view>
         <view class="stats-list">
           <view wx:for="{{registrationStats.departmentStats}}" wx:key="name" class="stat-row">
             <view class="stat-main">
@@ -123,14 +123,14 @@
     </view>
 
     <view class="section" wx:if="{{participants.length > 0}}">
-      <view class="section-title">部门抽签</view>
+      <view class="section-title">团体抽签</view>
       <view class="draw-actions">
-        <button class="draw-btn" bindtap="runDepartmentDraw">部门抽签</button>
-        <button class="draw-btn" bindtap="runDepartmentBattle">部门对战</button>
+        <button class="draw-btn" bindtap="runDepartmentDraw">团体抽签</button>
+        <button class="draw-btn" bindtap="runDepartmentBattle">团体对战</button>
       </view>
 
       <view wx:if="{{departmentDraws.length > 0}}" class="draw-result">
-        <view class="result-title">部门抽签结果</view>
+        <view class="result-title">团体抽签结果</view>
         <view wx:for="{{departmentDraws}}" wx:key="round" class="department-match">
           <view class="department-side">
             <text class="department-name">{{item.departmentA.name}}</text>
@@ -148,7 +148,7 @@
       </view>
 
       <view wx:if="{{departmentBattles.length > 0}}" class="draw-result">
-        <view class="result-title">部门对战表</view>
+        <view class="result-title">团体对战表</view>
         <view wx:for="{{departmentBattles}}" wx:key="round" class="battle-match">
           <view class="battle-side">
             <text class="battle-name">{{item.departmentA.name}}</text>

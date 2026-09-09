@@ -1,6 +1,6 @@
-const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const { fetchAll } = require('../../utils/db');
 
 Page({
   data: {
@@ -18,6 +18,12 @@ Page({
     if (options.id) {
       this.setData({ itemId: options.id });
       this.loadItemInfo();
+    } else {
+      this.setData({ loading: false });
+      wx.showToast({
+        title: '缺少比赛项目参数',
+        icon: 'none'
+      });
     }
   },
 
@@ -47,36 +53,29 @@ Page({
 
   loadPlayers: function (itemName) {
     if (!itemName) return;
-    
-    db.collection('registrations').where({
-      items: _.in([itemName])
-    }).get().then(res => {
-      console.log('加载参赛选手成功', res.data.length);
-      this.setData({ players: res.data });
+
+    fetchAll(db, 'registrations', { where: { items: _.in([itemName]) }, orderBy: 'createTime' }).then(list => {
+      this.setData({ players: list });
     }).catch(err => {
       console.error('加载参赛选手失败', err);
     });
   },
 
   loadSchedules: function () {
-    db.collection('schedules').where({
-      itemId: this.data.itemId
-    }).orderBy('createTime', 'desc').get().then(res => {
-      console.log('加载赛程成功', res.data.length);
-      this.setData({ schedules: res.data });
+    fetchAll(db, 'schedules', { where: { itemId: this.data.itemId }, orderBy: 'createTime' }).then(list => {
+      this.setData({ schedules: list });
     }).catch(err => {
       console.error('加载赛程失败', err);
     });
   },
 
   loadResults: function () {
-    db.collection('matches').where({
-      itemId: this.data.itemId
-    }).orderBy('createTime', 'desc').get().then(res => {
-      console.log('加载比赛结果成功', res.data.length);
-      this.setData({ results: res.data });
+    fetchAll(db, 'matches', { where: { itemId: this.data.itemId }, orderBy: 'matchTime' }).then(list => {
+      this.setData({ results: list });
+      wx.stopPullDownRefresh();
     }).catch(err => {
       console.error('加载比赛结果失败', err);
+      wx.stopPullDownRefresh();
     });
   },
 
@@ -91,6 +90,5 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadItemInfo();
-    wx.stopPullDownRefresh();
   }
 });

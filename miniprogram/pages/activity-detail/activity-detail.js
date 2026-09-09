@@ -1,6 +1,7 @@
 const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const { fetchAll } = require('../../utils/db');
 const {
   buildRegistrationStats,
   drawDepartmentMatches,
@@ -31,7 +32,9 @@ Page({
     groupDraws: [],
     groupDrawGenerated: false,
     groupBattles: [],
-    groupBattleGenerated: false
+    groupBattleGenerated: false,
+    departmentBattles: [],
+    departmentBattleGenerated: false
   },
 
   onLoad: function (options) {
@@ -55,9 +58,11 @@ Page({
       wx.setNavigationBarTitle({
         title: activityRes.data.title || '活动详情'
       });
+      wx.stopPullDownRefresh();
     }).catch(err => {
       console.error('加载活动失败', err);
       this.setData({ loading: false, checkingStatus: false });
+      wx.stopPullDownRefresh();
       wx.showToast({
         title: '加载失败',
         icon: 'none'
@@ -80,10 +85,8 @@ Page({
           return;
         }
         
-        db.collection('registrations').where({
-          _openid: openid
-        }).get().then(res => {
-          const isRegistered = Boolean(getRegistrationForActivity(res.data, activityId, app.getLoginInfo()));
+        fetchAll(db, 'registrations', { where: { _openid: openid } }).then(list => {
+          const isRegistered = Boolean(getRegistrationForActivity(list, activityId, app.getLoginInfo()));
           this.setData({ isRegistered: isRegistered });
           resolve(isRegistered);
         }).catch(err => {
@@ -125,30 +128,25 @@ Page({
   },
 
   loadParticipantsData: function (activityId) {
-    return new Promise((resolve) => {
-      db.collection('registrations').where({
-        activityIds: _.in([activityId])
-      }).orderBy('createTime', 'desc').get().then(res => {
-        console.log('加载报名人员成功', res.data.length);
-        this.setParticipantsData(res.data);
-        resolve(res.data);
-      }).catch(err => {
-        console.error('加载报名人员失败', err);
-        resolve([]);
-      });
+    return fetchAll(db, 'registrations', {
+      where: { activityIds: _.in([activityId]) },
+      orderBy: 'createTime'
+    }).then(list => {
+      this.setParticipantsData(list);
+      return list;
+    }).catch(err => {
+      console.error('加载报名人员失败', err);
+      return [];
     });
-  },
-
-  checkRegistration: function () {
   },
 
   loadParticipants: function () {
     if (!this.data.activity) return;
-    db.collection('registrations').where({
-      activityIds: _.in([this.data.activity._id])
-    }).orderBy('createTime', 'desc').get().then(res => {
-      console.log('加载报名人员成功', res.data.length);
-      this.setParticipantsData(res.data);
+    fetchAll(db, 'registrations', {
+      where: { activityIds: _.in([this.data.activity._id]) },
+      orderBy: 'createTime'
+    }).then(list => {
+      this.setParticipantsData(list);
     }).catch(err => {
       console.error('加载报名人员失败', err);
     });
@@ -203,7 +201,7 @@ Page({
   runDepartmentDraw: function () {
     if (this.data.registrationStats.departmentStats.length < 2) {
       wx.showToast({
-        title: '至少需要2个部门',
+        title: '至少需要2个团体',
         icon: 'none'
       });
       return;
@@ -298,7 +296,7 @@ Page({
   runDepartmentBattle: function () {
     if (this.data.registrationStats.departmentStats.length < 2) {
       wx.showToast({
-        title: '至少需要2个部门才能生成对战',
+        title: '至少需要2个团体才能生成对战',
         icon: 'none'
       });
       return;
@@ -352,16 +350,14 @@ Page({
         return;
       }
 
-      db.collection('registrations').where({
-        _openid: openid
-      }).get().then(res => {
-        if (getRegistrationForActivity(res.data, this.data.activity._id, app.getLoginInfo())) {
+      fetchAll(db, 'registrations', { where: { _openid: openid } }).then(list => {
+        if (getRegistrationForActivity(list, this.data.activity._id, app.getLoginInfo())) {
           wx.showToast({ title: '您已报名此活动', icon: 'none' });
           this.setData({ isRegistered: true });
           return;
         }
 
-        const reusableRegistration = getReusableRegistration(res.data, app.getLoginInfo());
+        const reusableRegistration = getReusableRegistration(list, app.getLoginInfo());
 
         if (!reusableRegistration) {
           this.goToNewRegistration();
@@ -405,7 +401,6 @@ Page({
         activityNames: activityNames
       }
     }).then(() => {
-      this.updateActivityCount(true);
       wx.hideLoading();
       wx.showToast({
         title: '报名成功',
@@ -425,16 +420,6 @@ Page({
     });
   },
 
-  updateActivityCount: function (isAdd) {
-    const currentCount = Math.max(0, (this.data.activity.currentCount || 0) + (isAdd ? 1 : -1));
-    db.collection('activities').doc(this.data.activity._id).update({
-      data: { currentCount: currentCount }
-    });
-    this.setData({
-      'activity.currentCount': currentCount
-    });
-  },
-
   cancelRegistration: function () {
     wx.showModal({
       title: '确认取消',
@@ -444,49 +429,46 @@ Page({
           app.getUserOpenId(openid => {
             if (!openid) return;
             
-            db.collection('registrations').where({
-              _openid: openid
-            }).get().then(res => {
-              if (res.data.length > 0) {
-                const registration = getRegistrationForActivity(res.data, this.data.activity._id, app.getLoginInfo());
+            fetchAll(db, 'registrations', { where: { _openid: openid } }).then(list => {
+              const registration = getRegistrationForActivity(list, this.data.activity._id, app.getLoginInfo());
 
-                if (!registration) {
-                  wx.showToast({ title: '您未报名此活动', icon: 'none' });
-                  this.setData({ isRegistered: false });
-                  return;
-                }
-
-                const activityIds = registration.activityIds || [];
-                const activityNames = registration.activityNames || [];
-
-                const newActivityIds = activityIds.filter(id => id !== this.data.activity._id);
-                const newActivityNames = activityNames.filter(name => name !== this.data.activity.title);
-                
-                if (newActivityIds.length === 0) {
-                  db.collection('registrations').doc(registration._id).remove().then(() => {
-                    wx.showToast({ title: '已取消报名', icon: 'success' });
-                    this.setData({ isRegistered: false });
-                    this.updateActivityCount(false);
-                    setTimeout(() => {
-                      this.loadParticipants();
-                    }, 500);
-                  });
-                } else {
-                  db.collection('registrations').doc(registration._id).update({
-                    data: {
-                      activityIds: newActivityIds,
-                      activityNames: newActivityNames
-                    }
-                  }).then(() => {
-                    wx.showToast({ title: '已取消报名', icon: 'success' });
-                    this.setData({ isRegistered: false });
-                    this.updateActivityCount(false);
-                    setTimeout(() => {
-                      this.loadParticipants();
-                    }, 500);
-                  });
-                }
+              if (!registration) {
+                wx.showToast({ title: '您未报名此活动', icon: 'none' });
+                this.setData({ isRegistered: false });
+                return;
               }
+
+              const activityIds = registration.activityIds || [];
+              const activityNames = registration.activityNames || [];
+
+              const newActivityIds = activityIds.filter(id => id !== this.data.activity._id);
+              const newActivityNames = activityNames.filter(name => name !== this.data.activity.title);
+
+              if (newActivityIds.length === 0) {
+                db.collection('registrations').doc(registration._id).remove().then(() => {
+                  wx.showToast({ title: '已取消报名', icon: 'success' });
+                  this.setData({ isRegistered: false });
+                  setTimeout(() => {
+                    this.loadParticipants();
+                  }, 500);
+                });
+              } else {
+                db.collection('registrations').doc(registration._id).update({
+                  data: {
+                    activityIds: newActivityIds,
+                    activityNames: newActivityNames
+                  }
+                }).then(() => {
+                  wx.showToast({ title: '已取消报名', icon: 'success' });
+                  this.setData({ isRegistered: false });
+                  setTimeout(() => {
+                    this.loadParticipants();
+                  }, 500);
+                });
+              }
+            }).catch(err => {
+              console.error('取消报名失败', err);
+              wx.showToast({ title: '操作失败', icon: 'none' });
             });
           });
         }
@@ -570,6 +552,5 @@ Page({
     if (this.data.activity) {
       this.loadActivity(this.data.activity._id);
     }
-    wx.stopPullDownRefresh();
   }
 });

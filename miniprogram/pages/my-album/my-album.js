@@ -39,9 +39,11 @@ Page({
           photos: photos,
           loading: false
         });
+        wx.stopPullDownRefresh();
       }).catch(err => {
         console.error('加载照片失败', err);
         this.setData({ loading: false });
+        wx.stopPullDownRefresh();
         wx.showToast({
           title: '加载失败',
           icon: 'none'
@@ -51,12 +53,13 @@ Page({
   },
 
   chooseImage: function () {
-    wx.chooseImage({
+    wx.chooseMedia({
       count: 9,
+      mediaType: ['image'],
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
       success: res => {
-        const tempFilePaths = res.tempFilePaths;
+        const tempFilePaths = res.tempFiles.map(file => file.tempFilePath);
         this.uploadImages(tempFilePaths);
       }
     });
@@ -64,7 +67,7 @@ Page({
 
   uploadImages: function (filePaths) {
     wx.showLoading({ title: '上传中...' });
-    
+
     app.getUserOpenId(openid => {
       if (!openid) {
         wx.hideLoading();
@@ -75,32 +78,61 @@ Page({
         return;
       }
 
-      const uploadPromises = filePaths.map(path => {
+      // 先上传云存储，再逐张做内容安全检测，检测通过才写入照片记录
+      const uploadTasks = filePaths.map(path => {
         const cloudPath = `photos/${openid}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.jpg`;
         return wx.cloud.uploadFile({
           cloudPath: cloudPath,
           filePath: path
+        }).then(res => {
+          return this.checkImage(res.fileID).then(pass => ({ fileID: res.fileID, pass }));
         });
       });
 
-      Promise.all(uploadPromises).then(results => {
-        const dbPromises = results.map(result => {
+      Promise.all(uploadTasks).then(results => {
+        const passed = results.filter(r => r.pass);
+        const rejected = results.filter(r => !r.pass);
+
+        // 未通过检测的图片直接删除云文件，不留存
+        if (rejected.length > 0) {
+          wx.cloud.deleteFile({
+            fileList: rejected.map(r => r.fileID)
+          }).catch(() => { });
+        }
+
+        if (passed.length === 0) {
+          wx.hideLoading();
+          wx.showToast({
+            title: '图片含违规信息，请更换后重试',
+            icon: 'none'
+          });
+          return null;
+        }
+
+        const dbPromises = passed.map(r => {
           return db.collection('photos').add({
             data: {
-              fileID: result.fileID,
+              fileID: r.fileID,
               createTime: db.serverDate()
             }
           });
         });
 
-        return Promise.all(dbPromises);
-      }).then(() => {
-        wx.hideLoading();
-        wx.showToast({
-          title: '上传成功',
-          icon: 'success'
+        return Promise.all(dbPromises).then(() => {
+          wx.hideLoading();
+          if (rejected.length > 0) {
+            wx.showToast({
+              title: `${rejected.length}张图片含违规信息已拦截`,
+              icon: 'none'
+            });
+          } else {
+            wx.showToast({
+              title: '上传成功',
+              icon: 'success'
+            });
+          }
+          this.loadPhotos();
         });
-        this.loadPhotos();
       }).catch(err => {
         wx.hideLoading();
         console.error('上传失败', err);
@@ -109,6 +141,20 @@ Page({
           icon: 'none'
         });
       });
+    });
+  },
+
+  // 调用 imgSecCheck 云函数检测图片内容，检测失败时按不通过处理
+  checkImage: function (fileID) {
+    return wx.cloud.callFunction({
+      name: 'imgSecCheck',
+      data: { fileID: fileID }
+    }).then(res => {
+      const result = res.result || {};
+      return result.code === 0 && result.pass === true;
+    }).catch(err => {
+      console.error('内容检测失败', err);
+      return false;
     });
   },
 
@@ -168,6 +214,5 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadPhotos();
-    wx.stopPullDownRefresh();
   }
 });

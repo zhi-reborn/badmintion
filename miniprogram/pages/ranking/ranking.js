@@ -1,4 +1,5 @@
 const db = wx.cloud.database();
+const { fetchAll } = require('../../utils/db');
 const {
   buildDepartmentRankings
 } = require('../../utils/ranking');
@@ -12,7 +13,7 @@ Page({
     currentType: 'total',
     modes: [
       { key: 'player', name: '个人榜' },
-      { key: 'department', name: '部门榜' }
+      { key: 'department', name: '团体榜' }
     ],
     types: [
       { key: 'total', name: '总积分' },
@@ -35,40 +36,30 @@ Page({
 
   loadRankings: function () {
     Promise.all([
-      db.collection('rankings')
-        .orderBy(this.data.currentType, 'desc')
-        .limit(200)
-        .get(),
-      db.collection('registrations')
-        .limit(500)
-        .get()
-    ]).then(([rankingRes, registrationRes]) => {
-      const rankings = this.buildDisplayRankings(rankingRes.data, registrationRes.data);
+      fetchAll(db, 'rankings', { orderBy: this.data.currentType, max: 200 }),
+      fetchAll(db, 'registrations', { orderBy: 'createTime', max: 500 })
+    ]).then(([rankings, registrations]) => {
       this.setData({
-        rawRankings: rankingRes.data,
-        registrations: registrationRes.data,
-        rankings: rankings,
+        rawRankings: rankings,
+        registrations: registrations,
+        rankings: this.buildDisplayRankings(rankings, registrations),
         loading: false
       });
+      wx.stopPullDownRefresh();
     })
-      .catch(err => {
-        console.error('加载排行榜失败', err);
-        this.setData({ loading: false });
-      });
+    .catch(err => {
+      console.error('加载排行榜失败', err);
+      this.setData({ loading: false });
+      wx.stopPullDownRefresh();
+    });
   },
 
   loadMatchResults: function () {
-    db.collection('matches')
-      .orderBy('createTime', 'desc')
-      .limit(20)
-      .get()
-      .then(res => {
-        console.log('加载比赛结果成功', res.data.length);
-        this.setData({ matchResults: res.data });
-      })
-      .catch(err => {
-        console.error('加载比赛结果失败', err);
-      });
+    fetchAll(db, 'matches', { orderBy: 'createTime', max: 20 }).then(list => {
+      this.setData({ matchResults: list });
+    }).catch(err => {
+      console.error('加载比赛结果失败', err);
+    });
   },
 
   onTypeChange: function (e) {
@@ -95,19 +86,6 @@ Page({
     return (rankings || []).slice(0, 50);
   },
 
-  getScoreLabel: function () {
-    if (this.data.currentType === 'total') return '积分';
-    if (this.data.currentType === 'win') return '胜场';
-    return '场次';
-  },
-
-  getRankClass: function (index) {
-    if (index === 0) return 'rank-first';
-    if (index === 1) return 'rank-second';
-    if (index === 2) return 'rank-third';
-    return '';
-  },
-
   goToHome: function () {
     wx.switchTab({
       url: '/pages/index/index'
@@ -117,6 +95,5 @@ Page({
   onPullDownRefresh: function () {
     this.loadRankings();
     this.loadMatchResults();
-    wx.stopPullDownRefresh();
   }
 });

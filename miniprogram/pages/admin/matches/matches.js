@@ -1,6 +1,5 @@
-const app = getApp();
 const db = wx.cloud.database();
-const _ = db.command;
+const { fetchAll } = require('../../../utils/db');
 const {
   getDepartmentOptions,
   filterDepartmentOptions
@@ -25,7 +24,7 @@ Page({
     },
     statusOptions: ['报名中', '进行中', '已结束'],
     statusIndex: 0,
-    presetItems: ['男单', '女单', '男双', '女双', '混双'],
+    presetItems: ['团体赛', '趣味赛'],
     newMatch: {
       itemId: '',
       itemName: '',
@@ -40,6 +39,12 @@ Page({
     },
     roundOptions: ['第1轮', '第2轮', '第3轮', '第4轮', '半决赛', '决赛'],
     roundIndex: 0,
+    showPickerSheet: false,
+    pickerTitle: '',
+    pickerOptions: [],
+    pickerSelectedIndex: -1,
+    pickerField: '',
+    pickerEmptyText: '暂无可选项',
     team1PlayerIds: [],
     team2PlayerIds: [],
     team1Players: [],
@@ -65,12 +70,9 @@ Page({
   },
 
   loadMatchItems: function () {
-    db.collection('match_items')
-      .orderBy('createTime', 'desc')
-      .get()
-      .then(res => {
-        console.log('加载比赛项目成功', res.data.length);
-        this.setData({ matchItems: res.data });
+    fetchAll(db, 'match_items', { orderBy: 'createTime' })
+      .then(list => {
+        this.setData({ matchItems: list });
       })
       .catch(err => {
         console.error('加载比赛项目失败', err);
@@ -78,34 +80,29 @@ Page({
   },
 
   loadPlayers: function () {
-    db.collection('registrations')
-      .orderBy('createTime', 'desc')
-      .get()
-      .then(res => {
-        console.log('加载选手列表成功', res.data.length);
-        const departmentOptions = getDepartmentOptions(res.data);
-        this.setData({ 
-          players: res.data,
+    fetchAll(db, 'registrations', { orderBy: 'createTime' })
+      .then(list => {
+        const departmentOptions = getDepartmentOptions(list);
+        this.setData({
+          players: list,
           departmentOptions: departmentOptions,
           filteredDepartments1: departmentOptions,
           filteredDepartments2: departmentOptions,
-          filteredPlayers1: res.data,
-          filteredPlayers2: res.data
+          filteredPlayers1: list,
+          filteredPlayers2: list
         });
+        wx.stopPullDownRefresh();
       })
       .catch(err => {
         console.error('加载选手列表失败', err);
+        wx.stopPullDownRefresh();
       });
   },
 
   loadMatchResults: function () {
-    db.collection('matches')
-      .orderBy('createTime', 'desc')
-      .limit(50)
-      .get()
-      .then(res => {
-        console.log('加载比赛结果成功', res.data.length);
-        this.setData({ matchResults: res.data });
+    fetchAll(db, 'matches', { orderBy: 'createTime', max: 100 })
+      .then(list => {
+        this.setData({ matchResults: list });
       })
       .catch(err => {
         console.error('加载比赛结果失败', err);
@@ -258,24 +255,58 @@ Page({
   },
 
   closeMatchModal: function () {
-    this.setData({ showAddMatchModal: false });
-  },
-
-  onMatchItemChange: function (e) {
-    const index = e.detail.value;
-    const item = this.data.matchItems[index];
     this.setData({
-      'newMatch.itemId': item._id,
-      'newMatch.itemName': item.name
+      showAddMatchModal: false,
+      showPickerSheet: false
     });
   },
 
-  onRoundChange: function (e) {
-    const index = e.detail.value;
+  openItemPicker: function () {
+    if (this.data.matchItems.length === 0) {
+      wx.showToast({ title: '暂无比赛项目，请先在"比赛项目"页签添加', icon: 'none' });
+      return;
+    }
+    const selectedIndex = this.data.matchItems.findIndex(item => item._id === this.data.newMatch.itemId);
     this.setData({
-      roundIndex: index,
-      'newMatch.round': this.data.roundOptions[index]
+      showPickerSheet: true,
+      pickerTitle: '选择比赛项目',
+      pickerField: 'item',
+      pickerOptions: this.data.matchItems.map(item => ({ label: item.name })),
+      pickerSelectedIndex: selectedIndex
     });
+  },
+
+  openRoundPicker: function () {
+    this.setData({
+      showPickerSheet: true,
+      pickerTitle: '选择轮次',
+      pickerField: 'round',
+      pickerOptions: this.data.roundOptions.map(round => ({ label: round })),
+      pickerSelectedIndex: this.data.roundIndex
+    });
+  },
+
+  closePickerSheet: function () {
+    this.setData({ showPickerSheet: false });
+  },
+
+  onPickerOptionTap: function (e) {
+    const index = e.currentTarget.dataset.index;
+
+    if (this.data.pickerField === 'item') {
+      const item = this.data.matchItems[index];
+      this.setData({
+        'newMatch.itemId': item._id,
+        'newMatch.itemName': item.name,
+        showPickerSheet: false
+      });
+    } else if (this.data.pickerField === 'round') {
+      this.setData({
+        roundIndex: index,
+        'newMatch.round': this.data.roundOptions[index],
+        showPickerSheet: false
+      });
+    }
   },
 
   onScore1Input: function (e) {
@@ -463,7 +494,7 @@ Page({
 
     if (!newMatch.team1Department.trim() || !newMatch.team2Department.trim()) {
       wx.showToast({
-        title: '请填写双方部门',
+        title: '请填写双方团体名称',
         icon: 'none'
       });
       return;
@@ -585,7 +616,7 @@ Page({
         });
       }
     }).catch(err => {
-      console.error('更新部门排名失败', err);
+      console.error('更新团体排名失败', err);
     });
   },
 
@@ -633,7 +664,6 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadData();
-    wx.stopPullDownRefresh();
   },
 
   stopPropagation: function () {

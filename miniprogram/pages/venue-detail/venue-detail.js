@@ -1,66 +1,59 @@
-// pages/venue-detail/venue-detail.js
+const db = wx.cloud.database();
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    venue: null,
+    loading: true
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-
+  onLoad: function (options) {
+    this.venueId = options.id || '';
+    this.loadVenue();
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
+  loadVenue: function () {
+    if (!this.venueId) {
+      this.setData({ loading: false });
+      return;
+    }
+    db.collection('venues').doc(this.venueId).get()
+      .then(res => {
+        this.setData({ venue: res.data, loading: false });
+        wx.setNavigationBarTitle({ title: res.data.name || '场地详情' });
+      })
+      .catch(err => {
+        console.error('加载场地详情失败', err);
+        this.setData({ loading: false });
+        wx.showToast({ title: '场地不存在或已下架', icon: 'none' });
+      });
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
-
+  copyAddress: function () {
+    const address = this.data.venue && this.data.venue.address;
+    if (!address) {
+      wx.showToast({ title: '暂无地址信息', icon: 'none' });
+      return;
+    }
+    wx.setClipboardData({
+      data: address,
+      success: () => wx.showToast({ title: '地址已复制', icon: 'success' })
+    });
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
+  bookVenue: function () {
+    wx.showModal({
+      title: '预订咨询',
+      content: '场地预订请通过协会管理员确认档期与费用',
+      showCancel: false,
+      confirmText: '知道了'
+    });
   },
 
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
+  onShareAppMessage: function () {
+    const venue = this.data.venue || {};
+    return {
+      title: venue.name || '场地详情',
+      path: '/pages/venue-detail/venue-detail?id=' + this.venueId
+    };
   }
-})
+});

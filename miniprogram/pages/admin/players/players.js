@@ -1,5 +1,5 @@
-const app = getApp();
 const db = wx.cloud.database();
+const { fetchAll } = require('../../../utils/db');
 
 Page({
   data: {
@@ -22,15 +22,13 @@ Page({
   loadPlayers: function () {
     this.setData({ loading: true });
     
-    db.collection('registrations')
-      .orderBy('createTime', 'desc')
-      .get()
-      .then(res => {
-        console.log('加载选手列表成功', res.data.length);
+    fetchAll(db, 'registrations', { orderBy: 'createTime' })
+      .then(list => {
         this.setData({
-          players: res.data,
+          players: list,
           loading: false
         });
+        wx.stopPullDownRefresh();
       })
       .catch(err => {
         console.error('加载选手列表失败', err);
@@ -79,7 +77,6 @@ Page({
     }
 
     const newSkill = skillOptions[skillIndex];
-    console.log('修改技术等级:', editingPlayer._id, '->', newSkill);
 
     wx.showLoading({ title: '保存中...' });
 
@@ -109,7 +106,6 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadPlayers();
-    wx.stopPullDownRefresh();
   },
 
   stopPropagation: function () {

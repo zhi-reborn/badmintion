@@ -63,8 +63,10 @@ Page({
       this.loadPlayers();
       this.loadSchedules();
       this.loadResults();
+      wx.stopPullDownRefresh();
     }).catch(err => {
       console.error('加载比赛项目失败', err);
+      wx.stopPullDownRefresh();
     });
   },
 
@@ -254,7 +256,7 @@ Page({
     const indices = e.detail.value;
     const selected = indices.map(i => this.data.players[i]);
     this.setData({
-      'resultForm.team1': selected.map(p => ({ id: p._id, name: p.name })),
+      'resultForm.team1': selected.map(p => ({ id: p._id, name: p.name, openid: p._openid, department: p.department || '' })),
       resultTeam1Display: selected.map(p => p.name).join('、')
     });
 
@@ -341,7 +343,7 @@ Page({
     }
 
     if (!resultForm.team1Department.trim() || !resultForm.team2Department.trim()) {
-      wx.showToast({ title: '请填写双方部门', icon: 'none' });
+      wx.showToast({ title: '请填写双方团体名称', icon: 'none' });
       return;
     }
 
@@ -408,7 +410,7 @@ Page({
         });
       }
     }).catch(err => {
-      console.error('更新部门排名失败', err);
+      console.error('更新团体排名失败', err);
     });
   },
 
@@ -450,6 +452,8 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadData();
-    wx.stopPullDownRefresh();
+  },
+
+  stopPropagation: function () {
   }
 });
