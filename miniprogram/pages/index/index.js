@@ -51,18 +51,36 @@ Page({
 
   loadMatchStats: function () {
     db.collection('registrations').count().then(res => {
-      this.setData({ 'matchStats.totalPlayers': res.total });
+      this.animateStat('totalPlayers', res.total);
     }).catch(err => { });
 
     db.collection('matches').count().then(res => {
-      this.setData({ 'matchStats.totalMatches': res.total });
+      this.animateStat('totalMatches', res.total);
     }).catch(err => { });
 
     db.collection('match_items').where({
       status: '进行中'
     }).count().then(res => {
-      this.setData({ 'matchStats.ongoingItems': res.total });
+      this.animateStat('ongoingItems', res.total);
     }).catch(err => { });
+  },
+
+  // 数字滚动动画：从当前显示值缓动到目标值
+  animateStat: function (key, target) {
+    if (!this._statTimers) this._statTimers = {};
+    if (this._statTimers[key]) clearTimeout(this._statTimers[key]);
+
+    var from = this.data.matchStats[key] || 0;
+    var start = Date.now();
+    var duration = 700;
+
+    var tick = () => {
+      var p = Math.min((Date.now() - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      this.setData({ ['matchStats.' + key]: Math.round(from + (target - from) * eased) });
+      if (p < 1) this._statTimers[key] = setTimeout(tick, 30);
+    };
+    tick();
   },
 
   loadHotActivities: function () {
@@ -75,7 +93,14 @@ Page({
       .get()
       .then(res => attachRealRegistrationCounts(db, res.data))
       .then(list => {
-        this.setData({ hotActivities: list });
+        const hotActivities = list.map(item => ({
+          ...item,
+          typeClass: item.type === '比赛' ? 'match' : item.type === '约球' ? 'play' : 'train',
+          progressPct: item.maxCount
+            ? Math.min(100, Math.round(((item.currentCount || 0) / item.maxCount) * 100))
+            : 0
+        }));
+        this.setData({ hotActivities });
         wx.stopPullDownRefresh();
       })
       .catch(err => {

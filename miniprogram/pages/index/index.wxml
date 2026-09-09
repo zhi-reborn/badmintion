@@ -1,31 +1,51 @@
-<view class="container">
-  <view class="header">
-    <view class="header-content">
-      <view class="header-title">🏸 羽你相约</view>
-      <view class="header-subtitle">2026年“工会杯”羽毛球赛</view>
+<view class="page">
+
+  <!-- ================= Hero ================= -->
+  <view class="hero">
+    <view class="hero-ring hero-ring-1"></view>
+    <view class="hero-ring hero-ring-2"></view>
+    <view class="hero-dots"></view>
+    <view class="hero-slash hero-slash-1"></view>
+    <view class="hero-slash hero-slash-2"></view>
+    <view class="hero-ribbon"></view>
+    <view class="hero-shuttle">🏸</view>
+
+    <view class="hero-inner">
+      <view class="hero-badge">
+        <view class="hero-badge-dot"></view>
+        <text><text class="hero-badge-hl">安全第一</text>，比赛第二</text>
+      </view>
+      <view class="hero-title"><text class="hero-title-mark">羽</text>你相约</view>
+      <view class="hero-sub">2026年<text class="hero-sub-hl">“工会杯”</text>羽毛球赛</view>
     </view>
   </view>
 
-  <view class="stats-section">
-    <view class="stat-item">
+  <!-- ================= 数据面板 ================= -->
+  <view class="stats fade-up d1">
+    <view class="stat">
       <view class="stat-number">{{matchStats.totalPlayers}}</view>
       <view class="stat-label">报名人数</view>
     </view>
-    <view class="stat-item">
+    <view class="stat-divider"></view>
+    <view class="stat">
       <view class="stat-number">{{matchStats.totalMatches}}</view>
       <view class="stat-label">比赛场次</view>
     </view>
-    <view class="stat-item">
+    <view class="stat-divider"></view>
+    <view class="stat">
       <view class="stat-number">{{matchStats.ongoingItems}}</view>
       <view class="stat-label">进行中</view>
     </view>
   </view>
 
-  <view class="quick-actions">
-    <view 
-      wx:for="{{quickActions}}" 
-      wx:key="name" 
-      class="action-item" 
+  <!-- ================= 快捷入口 ================= -->
+  <view class="quick-actions fade-up d2">
+    <view
+      wx:for="{{quickActions}}"
+      wx:key="name"
+      class="action-item action-item--{{index}}"
+      hover-class="is-pressed"
+      hover-stay-time="60"
       data-url="{{item.url}}"
       bindtap="goToQuickAction"
     >
@@ -34,22 +54,44 @@
     </view>
   </view>
 
-  <view class="section">
-    <view class="section-header">
-      <view class="section-title">🔥 热门活动</view>
-      <view class="section-more" bindtap="goToQuickAction" data-url="/pages/activities/activities">更多 ›</view>
+  <!-- ================= 热门活动 ================= -->
+  <view class="panel fade-up d3">
+    <view class="panel-header">
+      <view class="panel-title">热门活动</view>
+      <view
+        class="panel-more"
+        hover-class="is-dim"
+        bindtap="goToQuickAction"
+        data-url="/pages/activities/activities"
+      >更多<text class="panel-chev">›</text></view>
     </view>
-    <view wx:if="{{hotActivities.length === 0}}" class="empty-tip">暂无活动</view>
+
+    <view wx:if="{{hotActivities.length === 0}}" class="empty">
+      <view class="empty-icon">🏸</view>
+      <view class="empty-text">暂无进行中的活动，下拉刷新试试</view>
+    </view>
+
     <view wx:else class="activity-list">
-      <view wx:for="{{hotActivities}}" wx:key="_id" class="activity-item" data-id="{{item._id}}" bindtap="goToActivityDetail">
-        <view class="activity-type {{item.type === '比赛' ? 'type-match' : item.type === '约球' ? 'type-play' : 'type-train'}}">
-          {{item.type}}
-        </view>
-        <view class="activity-content">
-          <view class="activity-title">{{item.title}}</view>
+      <view
+        wx:for="{{hotActivities}}"
+        wx:key="_id"
+        class="activity-item"
+        hover-class="is-pressed"
+        hover-stay-time="60"
+        data-id="{{item._id}}"
+        bindtap="goToActivityDetail"
+      >
+        <view class="activity-main">
+          <view class="activity-row">
+            <view class="type-pill type-pill--{{item.typeClass}}">{{item.type}}</view>
+            <view class="activity-title">{{item.title}}</view>
+          </view>
           <view class="activity-meta">
-            <text class="meta-item">📍 {{item.venue || '待定'}}</text>
-            <text class="meta-item">👥 {{item.currentCount || 0}}/{{item.maxCount}}人</text>
+            <view class="meta-item"><text class="meta-ico">📍</text>{{item.venue || '场地待定'}}</view>
+            <view class="meta-item"><text class="meta-ico">👥</text>{{item.currentCount || 0}}/{{item.maxCount}}人</view>
+          </view>
+          <view class="progress">
+            <view class="progress-fill progress-fill--{{item.typeClass}}" style="width: {{item.progressPct}}%"></view>
           </view>
         </view>
         <view class="activity-arrow">›</view>
@@ -57,21 +99,30 @@
     </view>
   </view>
 
-  <view class="section">
-    <view class="section-header">
-      <view class="section-title">📢 公告</view>
+  <!-- ================= 公告 ================= -->
+  <view class="panel fade-up d4">
+    <view class="panel-header">
+      <view class="panel-title">公告</view>
+      <view class="new-chip"><view class="new-dot"></view>最新</view>
     </view>
-    <view class="notice-item">
-      <view class="notice-title">欢迎参加公司羽毛球活动</view>
-      <view class="notice-content">请各位同事积极报名参加，锻炼身体！
-      报名后可在每个活动中查看所有报名选手信息。</view>
-      <view class="notice-time">2026-09-08</view>
+    <view class="notice">
+      <view class="notice-icon">📢</view>
+      <view class="notice-body">
+        <view class="notice-title">欢迎参加公司羽毛球活动</view>
+        <view class="notice-content">请各位同事积极报名参加，锻炼身体！报名后可在每个活动中查看所有报名选手信息。</view>
+        <view class="notice-time">2026-09-08</view>
+      </view>
     </view>
   </view>
 
-  <view wx:if="{{isAdmin}}" class="admin-entry" bindtap="goToAdmin">
-    <view class="admin-icon">⚙️</view>
-    <view class="admin-text">管理后台</view>
-    <view class="admin-arrow">›</view>
+  <!-- ================= 管理入口 ================= -->
+  <view class="fade-up d5">
+    <view wx:if="{{isAdmin}}" class="admin-entry" hover-class="is-pressed" hover-stay-time="60" bindtap="goToAdmin">
+      <view class="admin-icon">⚙️</view>
+      <view class="admin-text">管理后台</view>
+      <view class="admin-arrow">›</view>
+    </view>
   </view>
+
+  <view class="footer">羽毛球协会</view>
 </view>
