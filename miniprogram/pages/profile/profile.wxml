@@ -4,7 +4,7 @@
       <view class="avatar">{{loginInfo.nickName ? loginInfo.nickName[0] : '?'}}</view>
       <view class="user-detail">
         <view class="user-name">{{loginInfo.nickName || '未登录'}}</view>
-        <view class="user-dept">{{loginInfo.phone || '点击登录'}}</view>
+        <view class="user-dept">{{loginInfo.phone || (loginInfo ? '协会会员' : '点击登录')}}</view>
       </view>
     </view>
     <view wx:if="{{!loginInfo}}" class="login-btn" bindtap="goToLogin">

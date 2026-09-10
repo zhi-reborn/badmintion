@@ -1,74 +1,154 @@
+/* ================= 登录页 · 蒂芙尼蓝 × 珍珠白 ================= */
+
 .container {
+  position: relative;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0ABAB5 0%, #0ccec8 100%);
+  background:
+    radial-gradient(120% 80% at 85% 0%, rgba(255, 255, 255, 0.16), transparent 55%),
+    linear-gradient(168deg, #0ABAB5 0%, #09A69F 45%, #056E69 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40rpx;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
+/* ---------- 背景装饰 ---------- */
+.bg-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2rpx solid rgba(255, 255, 255, 0.20);
+}
+
+.bg-ring-1 {
+  width: 480rpx;
+  height: 480rpx;
+  top: -180rpx;
+  right: -160rpx;
+}
+
+.bg-ring-2 {
+  width: 320rpx;
+  height: 320rpx;
+  bottom: -120rpx;
+  left: -100rpx;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.bg-dots {
+  position: absolute;
+  left: 56rpx;
+  bottom: 120rpx;
+  width: 200rpx;
+  height: 120rpx;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.30) 2rpx, transparent 2rpx);
+  background-size: 22rpx 22rpx;
+}
+
+/* ---------- 登录卡片 ---------- */
 .login-card {
+  position: relative;
+  z-index: 2;
   width: 100%;
   background-color: #ffffff;
-  border-radius: 24rpx;
-  padding: 60rpx 40rpx;
-  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.1);
+  border-radius: 36rpx;
+  padding: 64rpx 48rpx 56rpx;
+  box-shadow: 0 32rpx 64rpx -20rpx rgba(3, 60, 57, 0.45);
+  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.logo-badge {
+  width: 150rpx;
+  height: 150rpx;
+  margin: 0 auto 28rpx;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #E1F6F4, #C9F0ED);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 14rpx 30rpx rgba(10, 186, 181, 0.28);
 }
 
 .logo {
-  font-size: 100rpx;
-  text-align: center;
-  margin-bottom: 20rpx;
+  font-size: 84rpx;
+  animation: floaty 5s ease-in-out infinite;
+}
+
+@keyframes floaty {
+  0%, 100% { transform: rotate(14deg) translateY(0); }
+  50% { transform: rotate(8deg) translateY(-10rpx); }
 }
 
 .title {
-  font-size: 40rpx;
-  font-weight: bold;
+  font-size: 44rpx;
+  font-weight: 900;
   text-align: center;
-  color: #333333;
-  margin-bottom: 10rpx;
+  letter-spacing: 4rpx;
+  color: #0F3835;
+  margin-bottom: 14rpx;
 }
 
 .subtitle {
-  font-size: 28rpx;
+  font-size: 26rpx;
   text-align: center;
-  color: #999999;
-  margin-bottom: 50rpx;
+  letter-spacing: 6rpx;
+  color: #9CB4B0;
+  margin-bottom: 56rpx;
 }
 
-.form-section {
-  margin-top: 10rpx;
-}
-
+/* ---------- 表单 ---------- */
 .input-row {
-  margin-bottom: 24rpx;
+  margin-bottom: 32rpx;
 }
 
 .input {
   width: 100%;
-  height: 90rpx;
-  background-color: #f5f5f5;
-  border-radius: 12rpx;
-  padding: 0 30rpx;
+  height: 96rpx;
+  background-color: #F4FAF9;
+  border: 2rpx solid #E3F0ED;
+  border-radius: 20rpx;
+  padding: 0 32rpx;
   font-size: 30rpx;
+  color: #16332F;
+  text-align: center;
   box-sizing: border-box;
+}
+
+.input-ph {
+  color: #AEC6C2;
+  letter-spacing: 2rpx;
 }
 
 .submit-btn {
   width: 100%;
-  height: 90rpx;
-  background-color: #0ABAB5;
+  height: 96rpx;
+  background: linear-gradient(135deg, #0ABAB5 0%, #079C96 100%);
   color: #ffffff;
-  border-radius: 50rpx;
+  border-radius: 20rpx;
   font-size: 32rpx;
-  font-weight: bold;
+  font-weight: 700;
+  letter-spacing: 8rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 30rpx;
+  margin-top: 16rpx;
   border: none;
+  box-shadow: 0 14rpx 28rpx rgba(10, 186, 181, 0.35);
+  transition: transform 0.15s ease;
 }
 
 .submit-btn::after {
   border: none;
+}
+
+.submit-btn.button-hover {
+  opacity: 0.88;
+  transform: scale(0.98);
+}
+
+/* ---------- 入场动画 ---------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30rpx); }
+  to { opacity: 1; transform: translateY(0); }
 }

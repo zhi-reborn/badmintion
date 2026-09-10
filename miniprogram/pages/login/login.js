@@ -3,8 +3,7 @@ const db = wx.cloud.database();
 
 Page({
   data: {
-    name: '',
-    phone: ''
+    name: ''
   },
 
   onLoad: function () {
@@ -14,20 +13,11 @@ Page({
     this.setData({ name: e.detail.value });
   },
 
-  onPhoneInput: function (e) {
-    this.setData({ phone: e.detail.value });
-  },
-
   doLogin: function () {
-    const { name, phone } = this.data;
-    
+    const { name } = this.data;
+
     if (!name || !name.trim()) {
       wx.showToast({ title: '请输入用户名', icon: 'none' });
-      return;
-    }
-    
-    if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
-      wx.showToast({ title: '请输入正确的手机号', icon: 'none' });
       return;
     }
 
@@ -43,11 +33,11 @@ Page({
         return;
       }
 
-      this.checkAndLogin(openid, name.trim(), phone);
+      this.checkAndLogin(openid, name.trim());
     });
   },
 
-  checkAndLogin: function (openid, name, phone) {
+  checkAndLogin: function (openid, name) {
     db.collection('users').where({
       nickName: name
     }).get().then(res => {
@@ -63,7 +53,7 @@ Page({
         }
       }
 
-      this.saveUserInfo(openid, name, phone);
+      this.saveUserInfo(openid, name);
     }).catch(err => {
       wx.hideLoading();
       console.error('检查用户名失败', err);
@@ -74,40 +64,42 @@ Page({
     });
   },
 
-  saveUserInfo: function (openid, name, phone) {
-    const loginData = {
-      nickName: name,
-      phone: phone,
-      loginType: 'phone',
-      loginTime: db.serverDate()
-    };
-
+  saveUserInfo: function (openid, name) {
     db.collection('users').where({
       _openid: openid
     }).get().then(userRes => {
       if (userRes.data.length > 0) {
+        // 老账号沿用原有手机号作为 userKey，保证历史报名记录关联不变
+        const existingPhone = userRes.data[0].phone || '';
         return db.collection('users').doc(userRes.data[0]._id).update({
-          data: loginData
-        });
-      } else {
-        return db.collection('users').add({
-          data: loginData
-        });
+          data: {
+            nickName: name,
+            loginType: 'name',
+            loginTime: db.serverDate()
+          }
+        }).then(() => existingPhone);
       }
-    }).then(() => {
-      const userData = {
+
+      return db.collection('users').add({
+        data: {
+          nickName: name,
+          loginType: 'name',
+          loginTime: db.serverDate()
+        }
+      }).then(() => '');
+    }).then(existingPhone => {
+      app.setLoginInfo({
         nickName: name,
-        phone: phone,
-        loginType: 'phone'
-      };
-      app.setLoginInfo(userData);
-      
+        phone: existingPhone,
+        loginType: 'name'
+      });
+
       wx.hideLoading();
       wx.showToast({
         title: '登录成功',
         icon: 'success'
       });
-      
+
       setTimeout(() => {
         wx.navigateBack();
       }, 1000);

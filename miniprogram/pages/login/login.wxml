@@ -1,15 +1,18 @@
 <view class="container">
+  <view class="bg-ring bg-ring-1"></view>
+  <view class="bg-ring bg-ring-2"></view>
+  <view class="bg-dots"></view>
+
   <view class="login-card">
-    <view class="logo">🏸</view>
+    <view class="logo-badge">
+      <view class="logo">🏸</view>
+    </view>
     <view class="title">羽毛球活动</view>
     <view class="subtitle">欢迎使用</view>
-    
+
     <view class="form-section">
       <view class="input-row">
-        <input class="input" type="text" placeholder="请输入用户名" bindinput="onNameInput" value="{{name}}" />
-      </view>
-      <view class="input-row">
-        <input class="input" type="number" placeholder="请输入手机号（选填）" bindinput="onPhoneInput" value="{{phone}}" maxlength="11" />
+        <input class="input" type="text" placeholder="请输入用户名" placeholder-class="input-ph" bindinput="onNameInput" value="{{name}}" />
       </view>
       <button class="submit-btn" bindtap="doLogin">登录</button>
     </view>
