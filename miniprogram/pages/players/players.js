@@ -55,5 +55,16 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadPlayers();
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: '羽毛球协会 · 参赛选手风采',
+      path: '/pages/players/players'
+    };
+  },
+
+  onShareTimeline: function () {
+    return { title: '羽毛球协会 · 参赛选手风采' };
   }
 });

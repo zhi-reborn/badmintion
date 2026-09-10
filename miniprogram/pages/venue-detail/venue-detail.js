@@ -55,5 +55,13 @@ Page({
       title: venue.name || '场地详情',
       path: '/pages/venue-detail/venue-detail?id=' + this.venueId
     };
+  },
+
+  onShareTimeline: function () {
+    const venue = this.data.venue || {};
+    return {
+      title: venue.name || '场地详情',
+      query: 'id=' + this.venueId
+    };
   }
 });

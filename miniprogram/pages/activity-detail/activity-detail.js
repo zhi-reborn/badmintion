@@ -39,6 +39,7 @@ Page({
 
   onLoad: function (options) {
     if (options.id) {
+      this.activityId = options.id;
       this.loadActivity(options.id);
     }
   },
@@ -552,5 +553,21 @@ Page({
     if (this.data.activity) {
       this.loadActivity(this.data.activity._id);
     }
+  },
+
+  onShareAppMessage: function () {
+    const activity = this.data.activity || {};
+    return {
+      title: activity.title || '羽毛球协会活动',
+      path: '/pages/activity-detail/activity-detail?id=' + (activity._id || this.activityId || '')
+    };
+  },
+
+  onShareTimeline: function () {
+    const activity = this.data.activity || {};
+    return {
+      title: activity.title || '羽毛球协会活动',
+      query: 'id=' + (activity._id || this.activityId || '')
+    };
   }
 });

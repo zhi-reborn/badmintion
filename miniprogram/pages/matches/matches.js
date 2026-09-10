@@ -68,5 +68,16 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadData();
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: '羽毛球比赛 · 赛程与成绩查询',
+      path: '/pages/matches/matches'
+    };
+  },
+
+  onShareTimeline: function () {
+    return { title: '羽毛球比赛 · 赛程与成绩查询' };
   }
 });

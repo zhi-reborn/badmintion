@@ -90,5 +90,21 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadItemInfo();
+  },
+
+  onShareAppMessage: function () {
+    const item = this.data.itemInfo || {};
+    return {
+      title: item.name ? `羽毛球比赛 · ${item.name}` : '羽毛球比赛详情',
+      path: '/pages/match-detail/match-detail?id=' + this.data.itemId
+    };
+  },
+
+  onShareTimeline: function () {
+    const item = this.data.itemInfo || {};
+    return {
+      title: item.name ? `羽毛球比赛 · ${item.name}` : '羽毛球比赛详情',
+      query: 'id=' + this.data.itemId
+    };
   }
 });

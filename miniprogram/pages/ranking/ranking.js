@@ -95,5 +95,16 @@ Page({
   onPullDownRefresh: function () {
     this.loadRankings();
     this.loadMatchResults();
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: '羽毛球协会 · 排行榜',
+      path: '/pages/ranking/ranking'
+    };
+  },
+
+  onShareTimeline: function () {
+    return { title: '羽毛球协会 · 排行榜' };
   }
 });

@@ -74,5 +74,16 @@ Page({
   onPullDownRefresh: function () {
     this.loadActivities();
     wx.stopPullDownRefresh();
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: '羽毛球活动报名进行中，快来参加吧',
+      path: '/pages/activities/activities'
+    };
+  },
+
+  onShareTimeline: function () {
+    return { title: '羽毛球活动报名进行中，快来参加吧' };
   }
 });

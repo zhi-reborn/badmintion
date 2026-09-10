@@ -76,5 +76,16 @@ Page({
 
   onPullDownRefresh: function () {
     this.loadVenues();
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: '羽毛球场地一览，欢迎来打球',
+      path: '/pages/venues/venues'
+    };
+  },
+
+  onShareTimeline: function () {
+    return { title: '羽毛球场地一览，欢迎来打球' };
   }
 });

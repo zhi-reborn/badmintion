@@ -165,5 +165,16 @@ Page({
   onPullDownRefresh: function () {
     this.loadLoginInfo();
     this.getOpenId();
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: '羽毛球协会 · 羽你同行',
+      path: '/pages/index/index'
+    };
+  },
+
+  onShareTimeline: function () {
+    return { title: '羽毛球协会 · 羽你同行' };
   }
 });
