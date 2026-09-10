@@ -1,49 +1,76 @@
+/* ================= 报名页 · 蒂芙尼蓝 × 珍珠白 ================= */
+
 .container {
   padding: 30rpx;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #EFF6F5;
+  box-sizing: border-box;
 }
 
+/* ---------- 表单卡片 ---------- */
 .form-section {
   background-color: #ffffff;
-  border-radius: 16rpx;
-  padding: 30rpx;
+  border-radius: 28rpx;
+  padding: 40rpx 32rpx;
   margin-bottom: 30rpx;
+  border: 1rpx solid rgba(10, 186, 181, 0.10);
+  box-shadow: 0 12rpx 32rpx rgba(7, 89, 85, 0.06);
+  animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .form-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333333;
+  position: relative;
+  padding-left: 26rpx;
+  font-size: 34rpx;
+  font-weight: 800;
+  letter-spacing: 1rpx;
+  color: #0F3835;
   margin-bottom: 40rpx;
-  text-align: center;
 }
 
+.form-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8rpx;
+  height: 32rpx;
+  border-radius: 8rpx;
+  background: linear-gradient(180deg, #5FDFD8, #0ABAB5);
+}
+
+/* ---------- 表单项 ---------- */
 .form-item {
-  margin-bottom: 30rpx;
+  margin-bottom: 32rpx;
 }
 
 .form-label {
-  font-size: 28rpx;
-  color: #333333;
-  margin-bottom: 12rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  color: #3A5250;
+  margin-bottom: 14rpx;
   display: block;
 }
 
 .required {
-  color: #ff4d4f;
+  color: #FF6B5E;
 }
 
 .form-input {
   width: 100%;
-  height: 80rpx;
-  background-color: #f5f5f5;
-  border-radius: 8rpx;
-  padding: 0 20rpx;
+  height: 88rpx;
+  background-color: #F4FAF9;
+  border: 2rpx solid #E3F0ED;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
   font-size: 28rpx;
+  color: #16332F;
   box-sizing: border-box;
 }
 
+/* ---------- 性别分段 ---------- */
 .gender-segment {
   display: flex;
   gap: 20rpx;
@@ -51,43 +78,49 @@
 
 .gender-option {
   flex: 1;
-  height: 80rpx;
-  line-height: 80rpx;
+  height: 88rpx;
+  line-height: 84rpx;
   text-align: center;
-  background-color: #f5f5f5;
-  border-radius: 8rpx;
+  background-color: #F4FAF9;
+  border-radius: 16rpx;
   font-size: 28rpx;
-  color: #666666;
-  border: 2rpx solid transparent;
+  color: #5F7472;
+  border: 2rpx solid #E3F0ED;
   box-sizing: border-box;
   transition: all 0.2s;
 }
 
 .gender-option.active {
-  background-color: #e6f7f7;
-  color: #0ABAB5;
+  background-color: #E1F6F4;
+  color: #0A9B96;
   border-color: #0ABAB5;
-  font-weight: 500;
+  font-weight: 700;
 }
 
+/* ---------- 选择器 ---------- */
 .form-picker {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f5f5f5;
-  padding: 20rpx;
-  border-radius: 8rpx;
+  height: 88rpx;
+  background-color: #F4FAF9;
+  border: 2rpx solid #E3F0ED;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
   font-size: 28rpx;
+  color: #16332F;
+  box-sizing: border-box;
 }
 
 .picker-arrow {
-  font-size: 24rpx;
-  color: #999999;
+  font-size: 22rpx;
+  color: #9CB4B0;
 }
 
+/* ---------- 活动多选 ---------- */
 .activity-select {
-  background-color: #f5f5f5;
-  border-radius: 8rpx;
+  background-color: #F4FAF9;
+  border-radius: 16rpx;
   padding: 16rpx;
 }
 
@@ -97,8 +130,14 @@
   padding: 24rpx;
   margin-bottom: 16rpx;
   background-color: #ffffff;
-  border-radius: 12rpx;
-  border: 2rpx solid #e8e8e8;
+  border-radius: 16rpx;
+  border: 2rpx solid #E3F0ED;
+  transition: all 0.2s ease;
+}
+
+.activity-item.is-checked {
+  background-color: #F2FCFB;
+  border-color: #0ABAB5;
 }
 
 .activity-item checkbox {
@@ -116,23 +155,24 @@
 
 .activity-title {
   font-size: 28rpx;
-  font-weight: bold;
-  color: #333333;
+  font-weight: 700;
+  color: #0F3835;
   margin-bottom: 8rpx;
 }
 
 .activity-desc {
   font-size: 24rpx;
-  color: #666666;
+  color: #77908C;
 }
 
 .empty-tip {
   text-align: center;
-  color: #999999;
+  color: #96AAA7;
   padding: 30rpx;
   font-size: 26rpx;
 }
 
+/* ---------- 参赛项目 ---------- */
 .match-items-select {
   display: flex;
   flex-wrap: wrap;
@@ -140,59 +180,90 @@
 }
 
 .match-item-tag {
-  padding: 12rpx 24rpx;
-  background-color: #f0f0f0;
-  border-radius: 8rpx;
+  padding: 14rpx 30rpx;
+  background-color: #F4FAF9;
+  border: 2rpx solid #E3F0ED;
+  border-radius: 999rpx;
   font-size: 26rpx;
-  color: #666666;
+  color: #5F7472;
+  transition: all 0.2s ease;
 }
 
 .match-item-tag.checked {
-  background-color: #e6f7f7;
-  color: #0ABAB5;
+  background-color: #E1F6F4;
+  border-color: #0ABAB5;
+  color: #0A9B96;
+  font-weight: 700;
 }
 
+/* ---------- 提交按钮 ---------- */
 .form-actions {
-  margin-top: 30rpx;
+  margin-top: 40rpx;
   display: flex;
   gap: 20rpx;
 }
 
-.btn-cancel {
+.btn-cancel,
+.btn-submit {
   flex: 1;
-  height: 88rpx;
+  height: 92rpx;
   line-height: 88rpx;
-  background-color: #ffffff;
-  color: #666666;
-  border: 2rpx solid #d9d9d9;
-  border-radius: 12rpx;
+  border-radius: 18rpx;
   font-size: 30rpx;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.btn-cancel::after,
+.btn-submit::after,
+.btn-cancel-small::after {
+  border: none;
+}
+
+.btn-cancel {
+  background-color: #ffffff;
+  color: #5F7472;
+  border: 2rpx solid #D5E5E2;
 }
 
 .btn-submit {
-  flex: 1;
-  height: 88rpx;
-  line-height: 88rpx;
-  background-color: #0ABAB5;
+  background: linear-gradient(135deg, #0ABAB5 0%, #079C96 100%);
   color: #ffffff;
-  border-radius: 12rpx;
-  font-size: 30rpx;
+  font-weight: 700;
+  box-shadow: 0 12rpx 24rpx rgba(10, 186, 181, 0.32);
 }
 
+/* ---------- 我的报名记录 ---------- */
 .my-registrations {
   background-color: #ffffff;
-  border-radius: 16rpx;
-  padding: 30rpx;
+  border-radius: 28rpx;
+  padding: 36rpx 32rpx;
   margin-top: 30rpx;
+  border: 1rpx solid rgba(10, 186, 181, 0.10);
+  box-shadow: 0 12rpx 32rpx rgba(7, 89, 85, 0.06);
+  animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
 }
 
 .section-title {
+  position: relative;
+  padding-left: 26rpx;
   font-size: 32rpx;
-  font-weight: bold;
-  color: #333333;
-  margin-bottom: 20rpx;
-  padding-bottom: 16rpx;
-  border-bottom: 2rpx solid #f0f0f0;
+  font-weight: 800;
+  color: #0F3835;
+  margin-bottom: 24rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #F0F6F5;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4rpx;
+  width: 8rpx;
+  height: 28rpx;
+  border-radius: 8rpx;
+  background: linear-gradient(180deg, #5FDFD8, #0ABAB5);
 }
 
 .registration-list {
@@ -200,10 +271,11 @@
 }
 
 .registration-card {
-  background-color: #fafafa;
-  border-radius: 12rpx;
-  padding: 20rpx;
+  background-color: #F7FBFA;
+  border-radius: 18rpx;
+  padding: 24rpx;
   margin-bottom: 20rpx;
+  border: 1rpx solid #E8F2F0;
 }
 
 .registration-card:last-child {
@@ -219,14 +291,15 @@
 
 .reg-name {
   font-size: 30rpx;
-  font-weight: bold;
-  color: #333333;
+  font-weight: 700;
+  color: #0F3835;
 }
 
 .reg-info {
   font-size: 26rpx;
-  color: #666666;
+  color: #5F7472;
   margin-bottom: 12rpx;
+  line-height: 1.6;
 }
 
 .reg-info text {
@@ -240,27 +313,34 @@
 .item-tag {
   display: inline-block;
   padding: 6rpx 16rpx;
-  background-color: #e6f7f7;
-  color: #0ABAB5;
-  border-radius: 6rpx;
+  background-color: #E1F6F4;
+  color: #0A9B96;
+  border-radius: 8rpx;
   font-size: 24rpx;
   margin-right: 10rpx;
   margin-bottom: 10rpx;
 }
 
 .card-actions {
-  padding-top: 12rpx;
-  border-top: 2rpx solid #f0f0f0;
+  padding-top: 16rpx;
+  border-top: 2rpx solid #EBF3F1;
 }
 
 .btn-cancel-small {
   width: auto;
-  height: 60rpx;
+  height: 64rpx;
   line-height: 60rpx;
-  padding: 0 30rpx;
+  padding: 0 32rpx;
   background-color: #ffffff;
-  color: #ff4d4f;
-  border: 2rpx solid #ff4d4f;
-  border-radius: 8rpx;
+  color: #FF6B5E;
+  border: 2rpx solid #FFC2B8;
+  border-radius: 12rpx;
   font-size: 26rpx;
+  font-weight: 600;
+}
+
+/* ---------- 入场动画 ---------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24rpx); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -23,11 +23,6 @@
     </view>
 
     <view class="form-item">
-      <view class="form-label">联系电话</view>
-      <input class="form-input" type="number" placeholder="请输入手机号（选填）" data-field="phone" value="{{formData.phone}}" bindinput="onInputChange" />
-    </view>
-
-    <view class="form-item">
       <view class="form-label">团体名称</view>
       <input class="form-input" placeholder="请输入团体名称（选填）" data-field="department" value="{{formData.department}}" bindinput="onInputChange" />
     </view>
@@ -50,7 +45,7 @@
         </view>
         <block wx:else>
           <checkbox-group bindchange="onActivityChange">
-            <label class="activity-item" wx:for="{{activities}}" wx:key="_id">
+            <label class="activity-item {{item.checked ? 'is-checked' : ''}}" wx:for="{{activities}}" wx:key="_id">
               <checkbox value="{{item._id}}" checked="{{item.checked}}" color="#0ABAB5" />
               <view class="activity-content">
                 <view class="activity-title">{{item.title}}</view>

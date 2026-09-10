@@ -40,7 +40,7 @@
           <text class="detail-label">性别</text>
           <text class="detail-value">{{item.gender}}</text>
         </view>
-        <view class="detail-item">
+        <view class="detail-item" wx:if="{{item.phone}}">
           <text class="detail-label">电话</text>
           <text class="detail-value">{{item.phone}}</text>
         </view>

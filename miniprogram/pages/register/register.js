@@ -11,7 +11,6 @@ Page({
   data: {
     formData: {
       name: '',
-      phone: '',
       department: '',
       gender: '男',
       skillLevel: '中级',
@@ -164,7 +163,6 @@ Page({
     this.setData({
       formData: {
         name: '',
-        phone: '',
         department: '',
         gender: '男',
         skillLevel: '中级',
@@ -185,14 +183,10 @@ Page({
   },
 
   validateForm: function () {
-    const { name, phone, gender, activityIds } = this.data.formData;
-    
+    const { name, gender, activityIds } = this.data.formData;
+
     if (!name || !name.trim()) {
       wx.showToast({ title: '请输入姓名', icon: 'none' });
-      return false;
-    }
-    if (phone && phone.trim() && !/^1[3-9]\d{9}$/.test(phone)) {
-      wx.showToast({ title: '请输入正确的手机号', icon: 'none' });
       return false;
     }
     if (!gender) {
@@ -225,7 +219,6 @@ Page({
 
     const registrationData = {
       name: this.data.formData.name,
-      phone: this.data.formData.phone,
       userKey: app.getCurrentUserKey(),
       loginName: (app.getLoginInfo() && app.getLoginInfo().nickName) || '',
       department: this.data.formData.department,

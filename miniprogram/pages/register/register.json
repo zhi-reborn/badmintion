@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "报名参赛"
+  "navigationBarTitleText": "报名参赛",
+  "navigationBarBackgroundColor": "#0ABAB5",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#EFF6F5"
 }
