@@ -108,6 +108,41 @@ Page({
     this.loadPlayers();
   },
 
+  deleteRegistration: function (e) {
+    const player = e.currentTarget.dataset.player;
+    const activityNames = (player.activityNames && player.activityNames.length)
+      ? player.activityNames.join('、')
+      : '无';
+    const items = (player.items && player.items.length)
+      ? player.items.join('、')
+      : '无';
+
+    wx.showModal({
+      title: '删除报名',
+      content: `确定删除「${player.name}」的整条报名记录吗？\n活动：${activityNames}\n参赛项目：${items}\n删除后不可恢复`,
+      confirmText: '删除',
+      confirmColor: '#e64340',
+      success: res => {
+        if (!res.confirm) return;
+
+        wx.showLoading({ title: '删除中...' });
+        db.collection('registrations').doc(player._id).remove().then(() => {
+          wx.hideLoading();
+          wx.showToast({ title: '已删除', icon: 'success' });
+          this.loadPlayers();
+        }).catch(err => {
+          wx.hideLoading();
+          console.error('删除报名失败', err);
+          wx.showModal({
+            title: '删除失败',
+            content: '错误: ' + (err.errMsg || JSON.stringify(err)) + '\n\n请检查数据库权限，registrations 集合需要设置为"所有用户可读写"。',
+            showCancel: false
+          });
+        });
+      }
+    });
+  },
+
   stopPropagation: function () {
   }
 });

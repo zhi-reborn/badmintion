@@ -45,6 +45,7 @@
 
       <view class="player-actions">
         <button class="btn-edit" data-player="{{item}}" bindtap="showEditDialog">修改技术等级</button>
+        <button class="btn-delete" data-player="{{item}}" bindtap="deleteRegistration">删除报名</button>
       </view>
     </view>
   </view>
